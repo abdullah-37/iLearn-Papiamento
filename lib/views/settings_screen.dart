@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
 
 class SettingsPanelWidget extends StatelessWidget {
-  final VoidCallback onClose;
-  const SettingsPanelWidget({required this.onClose, super.key});
+  // final VoidCallback onClose;
+  const SettingsPanelWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.sizeOf(context).height;
     return Scaffold(
-      backgroundColor: AppColors.appBg,
       appBar: AppBar(
         // centerTitle: true,
         title: const Text('Settings', style: TextStyle(color: Colors.white)),

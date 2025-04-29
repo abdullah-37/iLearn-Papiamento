@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/localization_provider.dart';
 import 'package:ilearn_papiamento/views/home_screen.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final appLang = context.watch<AppLanguage>();
     return MaterialApp(
+      theme: ThemeData(scaffoldBackgroundColor: AppColors.appBg),
       debugShowCheckedModeBanner: false,
       locale: appLang.locale,
       supportedLocales: const [

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/config/app_strings.dart';
+import 'package:ilearn_papiamento/config/config.dart';
 import 'package:ilearn_papiamento/data.dart';
 import 'package:ilearn_papiamento/data_loader.dart';
 import 'package:ilearn_papiamento/views/learn_screen.dart';
 import 'package:ilearn_papiamento/views/settings_screen.dart';
 import 'package:ilearn_papiamento/widgets/home_grid_widget.dart';
+import 'package:ilearn_papiamento/widgets/line_below_appbar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: AppConfig.animationDuration),
     );
   }
 
@@ -48,13 +50,32 @@ class _HomeScreenState extends State<HomeScreen>
     final panelWidth = size.width * 0.8;
     var mainContainer = MainContentWidget(
       onSettingsTap: _toggle,
+      iconWidget: GestureDetector(
+        onTap: _toggle,
+        // Update controller.value as we drag
+        onHorizontalDragUpdate: (details) {
+          final delta = details.primaryDelta ?? 0;
+          _ctrl.value = (_ctrl.value - delta / panelWidth).clamp(0.0, 1.0);
+        },
+        // On release, snap open/closed based on velocity or position
+        onHorizontalDragEnd: (details) {
+          final v = details.primaryVelocity ?? 0;
+          if (v.abs() > 300) {
+            // fling in direction of swipe
+            _ctrl.fling(velocity: v < 0 ? 1 : -1);
+          } else {
+            // snap by midpoint
+            _ctrl.fling(velocity: _ctrl.value > 0.5 ? 1 : -1);
+          }
+        },
+        child: const Icon(Icons.settings, color: Colors.white, size: 35),
+      ),
       // consider open if controller is past halfway
       isClicked: _ctrl.value > 0.5,
     );
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: AppColors.appBg,
         // Use AnimatedBuilder so the Stack rebuilds on each tick of the controller
         body: AnimatedBuilder(
           animation: _ctrl,
@@ -71,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen>
                   // panel’s left edge = screenWidth – how far we’ve slid
                   right: 0,
                   width: panelWidth,
-                  child: SettingsPanelWidget(onClose: _toggle),
+                  child: const SettingsPanelWidget(),
                 ),
                 // ——— DRAGGABLE MAIN CONTENT ———
                 Positioned(
@@ -81,24 +102,24 @@ class _HomeScreenState extends State<HomeScreen>
                   right: slide,
                   child: GestureDetector(
                     // Update controller.value as we drag
-                    onHorizontalDragUpdate: (details) {
-                      final delta = details.primaryDelta ?? 0;
-                      _ctrl.value = (_ctrl.value - delta / panelWidth).clamp(
-                        0.0,
-                        1.0,
-                      );
-                    },
-                    // On release, snap open/closed based on velocity or position
-                    onHorizontalDragEnd: (details) {
-                      final v = details.primaryVelocity ?? 0;
-                      if (v.abs() > 300) {
-                        // fling in direction of swipe
-                        _ctrl.fling(velocity: v < 0 ? 1 : -1);
-                      } else {
-                        // snap by midpoint
-                        _ctrl.fling(velocity: _ctrl.value > 0.5 ? 1 : -1);
-                      }
-                    },
+                    // onHorizontalDragUpdate: (details) {
+                    //   final delta = details.primaryDelta ?? 0;
+                    //   _ctrl.value = (_ctrl.value - delta / panelWidth).clamp(
+                    //     0.0,
+                    //     1.0,
+                    //   );
+                    // },
+                    // // On release, snap open/closed based on velocity or position
+                    // onHorizontalDragEnd: (details) {
+                    //   final v = details.primaryVelocity ?? 0;
+                    //   if (v.abs() > 300) {
+                    //     // fling in direction of swipe
+                    //     _ctrl.fling(velocity: v < 0 ? 1 : -1);
+                    //   } else {
+                    //     // snap by midpoint
+                    //     _ctrl.fling(velocity: _ctrl.value > 0.5 ? 1 : -1);
+                    //   }
+                    // },
                     child: mainContainer,
                   ),
                 ),
@@ -113,8 +134,10 @@ class _HomeScreenState extends State<HomeScreen>
 
 class MainContentWidget extends StatelessWidget {
   final VoidCallback onSettingsTap;
+  final Widget iconWidget;
   final bool isClicked;
   const MainContentWidget({
+    required this.iconWidget,
     required this.onSettingsTap,
     super.key,
     required this.isClicked,
@@ -124,7 +147,6 @@ class MainContentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = Localizations.localeOf(context).languageCode;
     return Scaffold(
-      backgroundColor: AppColors.appBg,
       appBar: AppBar(
         title: const Text(
           AppStrings.appName,
@@ -134,14 +156,16 @@ class MainContentWidget extends StatelessWidget {
         backgroundColor: AppColors.appBg,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: onSettingsTap,
-          ),
+          iconWidget,
+          // IconButton(
+          //   icon: const Icon(Icons.settings, color: Colors.white),
+          //   onPressed: onSettingsTap,
+          // ),
+          const SizedBox(width: 20),
         ],
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, color: Colors.white24),
+          child: LineBelowAppBar(),
         ),
       ),
       body: FutureBuilder<List<HomeModuleData>>(
