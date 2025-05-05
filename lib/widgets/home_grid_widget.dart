@@ -1,22 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:ilearn_papiamento/models/data_model.dart';
 
 class HomeGridWidget extends StatelessWidget {
-  const HomeGridWidget({super.key, required this.tile, required this.name});
+  final Datum category;
 
-  final Map<String, dynamic> tile;
-  final String name;
+  const HomeGridWidget({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {
+    final lang = Localizations.localeOf(context).languageCode;
+    String name;
+    switch (lang) {
+      case 'en':
+        name = category.categoryEng ?? '';
+        break;
+      case 'es':
+        name = category.categorySpan ?? '';
+        break;
+      case 'nl':
+        name = category.categoryDutch ?? '';
+        break;
+      case 'zh':
+        name = category.categoryChine ?? '';
+      default:
+        name = category.categoryEng ?? '';
+    }
+    final color = Color(int.parse("FF${category.color}", radix: 16));
     return Container(
       decoration: BoxDecoration(
-        color: Color(tile['color']),
+        color: color,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(tile['icon'], height: 30),
+          Image.asset('assets/images/imganimals.png', height: 30),
           const SizedBox(height: 8),
           Text(
             name,

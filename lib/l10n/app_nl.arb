@@ -1,0 +1,63 @@
+{
+  "extras": "Extra's",
+  "@extras": {
+    "description": "Additional features or options in the app"
+  },
+  "languages": "Talen",
+  "@languages": {
+    "description": "List of available languages"
+  },
+  "soundspeaker": "Luidspreker",
+  "@soundspeaker": {
+    "description": "Audio output device"
+  },
+  "playauto": "Automatisch afspelen",
+  "@playauto": {
+    "description": "Automatic playback option"
+  },
+  "speechspeed": "Spraaksnelheid",
+  "@speechspeed": {
+    "description": "Speed of spoken text"
+  },
+  "sharethisapp": "Deel deze app",
+  "@sharethisapp": {
+    "description": "Option to share the app with others"
+  },
+  "ratenow": "Beoordeel nu",
+  "@ratenow": {
+    "description": "Prompt to rate the app"
+  },
+  "email": "E-mail",
+  "@email": {
+    "description": "Electronic mail contact option"
+  },
+  "facebook": "Facebook",
+  "@facebook": {
+    "description": "Social media platform"
+  },
+  "twitter": "Twitter",
+  "@twitter": {
+    "description": "Social media platform"
+  },
+  "about": "Over",
+  "@about": {
+    "description": "Information about the app"
+  },
+  "visitourpage": "Bezoek onze website",
+  "@visitourpage": {
+    "description": "Link to the app's webpage"
+  },
+  "facebooksupport": "Facebook/Ondersteuning",
+  "@facebooksupport": {
+    "description": "Facebook support page"
+  },
+  "likeusonfacebook": "Vind ons leuk op Facebook",
+  "@likeusonfacebook": {
+    "description": "Prompt to like the app's Facebook page"
+  },
+  "followontwitter": "Volg op Twitter",
+  "@followontwitter": {
+    "description": "Prompt to follow the app on Twitter"
+  },
+  "removeads":"Quitar anuncios"
+}

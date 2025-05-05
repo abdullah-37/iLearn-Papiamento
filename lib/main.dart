@@ -1,13 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
-import 'package:ilearn_papiamento/localization_provider.dart';
-import 'package:ilearn_papiamento/views/home_screen.dart';
+import 'package:ilearn_papiamento/providers/ads_provider.dart';
+import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
+import 'package:ilearn_papiamento/providers/localization_provider.dart';
+import 'package:ilearn_papiamento/views/splash_screen.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
+
   runApp(
-    ChangeNotifierProvider(create: (_) => AppLanguage(), child: const MyApp()),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AdsProvider()),
+        ChangeNotifierProvider(create: (_) => AppLanguage()),
+        // ChangeNotifierProvider(create: (_) => IAPProvider()),
+        ChangeNotifierProvider(create: (_) => FetchDataProvider()),
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -27,12 +44,14 @@ class MyApp extends StatelessWidget {
         Locale('zh'), // Dutch
       ],
       localizationsDelegates: const [
+        AppLocalizations.delegate,
+
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       // we don’t need arb/intl for data files, so we skip flutter_localizations here
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
