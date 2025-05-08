@@ -16,8 +16,8 @@ class ApiServices {
             "Authorization":
                 "Basic ${base64Encode(utf8.encode('${AppConfig.adminUserName}:${AppConfig.adminPassword}'))}",
           },
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
+          connectTimeout: const Duration(seconds: 20),
+          receiveTimeout: const Duration(seconds: 20),
         ),
       );
 

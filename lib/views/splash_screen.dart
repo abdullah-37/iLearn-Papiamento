@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_circular_progress_indicator/flutter_circular_progress_indicator.dart';
 import 'package:ilearn_papiamento/config/images.dart';
-import 'package:ilearn_papiamento/providers/ads_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
 import 'package:ilearn_papiamento/views/home_screen.dart';
 import 'package:provider/provider.dart';
@@ -11,13 +10,13 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var adsProvider = Provider.of<AdsProvider>(context, listen: true);
+    // var adsProvider = Provider.of<AdsProvider>(context, listen: true);
 
     return Scaffold(
       body: Consumer<FetchDataProvider>(
         builder: (context, provider, child) {
           // Navigate to HomeScreen when isLoading becomes false
-          if (provider.categoriesData != null && adsProvider.isLoaded) {
+          if (provider.categoriesData != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.pushReplacement(
                 context,

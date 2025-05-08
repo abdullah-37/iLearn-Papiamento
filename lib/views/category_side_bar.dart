@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
+import 'package:ilearn_papiamento/widgets/network_image.dart';
 import 'package:provider/provider.dart';
 
 class CategorySideBar extends StatelessWidget {
@@ -83,10 +84,18 @@ class CategorySideBar extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Row(
                           children: [
-                            Image.asset(
-                              'assets/images/imghotel.png',
-                              height: 40,
+                            Container(
+                              padding: const EdgeInsets.all(5),
+                              height: 60,
+                              width: 60,
+                              color: Color(
+                                int.parse("FF${category.color}", radix: 16),
+                              ),
+                              child: CustomNetworkImageWidget(
+                                imagePath: category.image!,
+                              ),
                             ),
+
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(

@@ -2,37 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:ilearn_papiamento/Services/audio_service.dart';
+import 'package:ilearn_papiamento/Services/shared_prefrence.dart';
 // import 'package:flutter_localizations/flutter_localizations.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
+import 'package:ilearn_papiamento/config/config.dart';
 import 'package:ilearn_papiamento/providers/ads_provider.dart';
+import 'package:ilearn_papiamento/providers/app_settings_provider.dart';
+import 'package:ilearn_papiamento/providers/audio_provider.dart';
+import 'package:ilearn_papiamento/providers/favourite_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
-import 'package:ilearn_papiamento/providers/localization_provider.dart';
 import 'package:ilearn_papiamento/views/splash_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MobileAds.instance.initialize();
+  final audioService = AudioService();
+  await SharedPrefsService.init();
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AdsProvider()),
-        ChangeNotifierProvider(create: (_) => AppLanguage()),
-        // ChangeNotifierProvider(create: (_) => IAPProvider()),
-        ChangeNotifierProvider(create: (_) => FetchDataProvider()),
+        ChangeNotifierProvider(create: (_) => AppSettingsProvider()),
+        ChangeNotifierProvider(create: (_) => AudioProvider(audioService)),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProvider(
+          create:
+              (_) => FetchDataProvider(audioBaseUrl: AppConfig.audioBaseUrl),
+        ),
       ],
       child: const MyApp(),
     ),
   );
+
+  await MobileAds.instance.initialize();
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    final appLang = context.watch<AppLanguage>();
+    final appLang = context.watch<AppSettingsProvider>();
     return MaterialApp(
       theme: ThemeData(scaffoldBackgroundColor: AppColors.appBg),
       debugShowCheckedModeBanner: false,
@@ -45,7 +57,6 @@ class MyApp extends StatelessWidget {
       ],
       localizationsDelegates: const [
         AppLocalizations.delegate,
-
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

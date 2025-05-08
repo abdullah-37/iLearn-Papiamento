@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ilearn_papiamento/providers/localization_provider.dart';
+import 'package:ilearn_papiamento/config/images.dart';
+import 'package:ilearn_papiamento/providers/app_settings_provider.dart';
 import 'package:provider/provider.dart';
 
 class LanguageSelectionScreen extends StatelessWidget {
@@ -7,7 +8,7 @@ class LanguageSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appLanguage = Provider.of<AppLanguage>(context, listen: true);
+    final appLanguage = Provider.of<AppSettingsProvider>(context, listen: true);
 
     return Scaffold(
       appBar: AppBar(
@@ -81,16 +82,14 @@ class LanguageTile extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        decoration: BoxDecoration(
-          color: const Color(0xFF303236),
+        decoration: const BoxDecoration(
+          color: Color(0xFF303236),
           border: Border(
-            bottom: BorderSide(
-              color: isSelected ? Colors.red : const Color(0xFF526E94),
-              width: 2,
-            ),
+            bottom: BorderSide(color: Color(0xFF526E94), width: 2),
           ),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,6 +101,7 @@ class LanguageTile extends StatelessWidget {
                 Text(subtitle, style: const TextStyle(color: Colors.white)),
               ],
             ),
+            if (isSelected) Image.asset(AppImages.checkImage, height: 20),
           ],
         ),
       ),

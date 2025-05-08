@@ -5,6 +5,7 @@ import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/config/config.dart';
 import 'package:ilearn_papiamento/providers/ads_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
+import 'package:ilearn_papiamento/views/favourite_screen.dart';
 import 'package:ilearn_papiamento/views/learn_screen.dart';
 import 'package:ilearn_papiamento/views/settings_screen.dart';
 import 'package:ilearn_papiamento/widgets/home_grid_widget.dart';
@@ -103,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen>
                 // ——— DRAGGABLE MAIN CONTENT ———
                 Positioned(
                   top: 0,
-                  bottom: 0,
+                  bottom: 00,
                   left: -slide,
                   right: slide,
                   child: GestureDetector(
@@ -126,26 +127,40 @@ class _HomeScreenState extends State<HomeScreen>
                         _ctrl.fling(velocity: _ctrl.value > 0.5 ? 1 : -1);
                       }
                     },
-                    child: mainContainer,
+                    child: Column(
+                      children: [
+                        Expanded(child: mainContainer),
+                        adsProvider.isLoaded
+                            ? Container(
+                              color: Colors.black,
+                              height:
+                                  adsProvider.bannerAd!.size.height.toDouble(),
+                              width: double.infinity,
+                              // adsProvider.bannerAd!.size.width.toDouble(),
+                              child: AdWidget(ad: adsProvider.bannerAd!),
+                            )
+                            : const SizedBox.shrink(),
+                      ],
+                    ),
                   ),
                 ),
                 //
                 // ads
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  height: 50,
-                  child:
-                      adsProvider.isLoaded
-                          ? SizedBox(
-                            height:
-                                adsProvider.bannerAd!.size.height.toDouble(),
-                            width: adsProvider.bannerAd!.size.width.toDouble(),
-                            child: AdWidget(ad: adsProvider.bannerAd!),
-                          )
-                          : const SizedBox.shrink(),
-                ),
+                // Positioned(
+                //   left: 0,
+                //   right: 0,
+                //   bottom: 0,
+                //   height: 50,
+                //   child:
+                //       adsProvider.isLoaded
+                //           ? SizedBox(
+                //             height:
+                //                 adsProvider.bannerAd!.size.height.toDouble(),
+                //             width: adsProvider.bannerAd!.size.width.toDouble(),
+                //             child: AdWidget(ad: adsProvider.bannerAd!),
+                //           )
+                //           : const SizedBox.shrink(),
+                // ),
               ],
             );
           },
@@ -208,12 +223,13 @@ class MainContentWidget extends StatelessWidget {
             }
             final categories = provider.categoriesData!.data!;
             return GridView.builder(
+              shrinkWrap: true,
               padding: const EdgeInsets.all(16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 childAspectRatio: 1,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
+                crossAxisSpacing: 13,
+                mainAxisSpacing: 13,
               ),
               itemCount: categories.length,
               itemBuilder: (context, i) {
@@ -236,19 +252,35 @@ class MainContentWidget extends StatelessWidget {
                 }
                 return GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (_) => LearnScreen(
-                              color: int.parse(
-                                "FF${category.color}",
-                                radix: 16,
+                    if (category.categoryId == '20') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => FavoritesScreen(
+                                category: category,
+                                color: int.parse(
+                                  "FF${category.color}",
+                                  radix: 16,
+                                ),
                               ),
-                              moduleKey: category.categoryId ?? '',
-                            ),
-                      ),
-                    );
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => LearnScreen(
+                                color: int.parse(
+                                  "FF${category.color}",
+                                  radix: 16,
+                                ),
+                                moduleKey: category.categoryId ?? '',
+                              ),
+                        ),
+                      );
+                    }
                   },
                   child: HomeGridWidget(category: category),
                 );

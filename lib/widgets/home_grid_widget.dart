@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ilearn_papiamento/models/data_model.dart';
+import 'package:ilearn_papiamento/widgets/network_image.dart';
 
 class HomeGridWidget extends StatelessWidget {
   final Datum category;
@@ -27,6 +28,7 @@ class HomeGridWidget extends StatelessWidget {
     }
     final color = Color(int.parse("FF${category.color}", radix: 16));
     return Container(
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(12),
@@ -34,9 +36,10 @@ class HomeGridWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset('assets/images/imganimals.png', height: 30),
+          CustomNetworkImageWidget(imagePath: category.image!, imageHeight: 40),
           const SizedBox(height: 8),
           Text(
+            // 'sdsds sdsd d',
             name,
             style: const TextStyle(
               color: Colors.white,

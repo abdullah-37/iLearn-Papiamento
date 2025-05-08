@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:ilearn_papiamento/config/config.dart';
 import 'package:ilearn_papiamento/config/images.dart';
 import 'package:ilearn_papiamento/models/data_model.dart';
+import 'package:ilearn_papiamento/providers/app_settings_provider.dart';
+import 'package:ilearn_papiamento/providers/audio_provider.dart';
+import 'package:ilearn_papiamento/providers/favourite_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
 import 'package:ilearn_papiamento/views/category_side_bar.dart';
+import 'package:ilearn_papiamento/views/favourite_screen.dart';
 import 'package:ilearn_papiamento/views/settings_screen.dart';
 import 'package:ilearn_papiamento/widgets/words_tile.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +55,7 @@ class _LearnScreenState extends State<LearnScreen>
     // Hook both icons up to the new toggle:
     var mainContainer = LearnContentWidget(
       color: Color(widget.color),
-      lefticon: GestureDetector(
+      leftIcon: GestureDetector(
         onHorizontalDragUpdate: (details) {
           // Reverse drag: dragging right (positive delta) increases value
           _openLeft = true;
@@ -101,8 +105,41 @@ class _LearnScreenState extends State<LearnScreen>
       ),
       // pass through:
       onSettingsTap: () {},
-      modulekey: _currentModuleKey,
+      moduleKey: _currentModuleKey,
       // islicked: ctrl.value > 0.5,
+    );
+    final sideCategories = CategorySideBar(
+      onCategoryTap: (String newKey) {
+        final provider = Provider.of<FetchDataProvider>(context, listen: false);
+
+        final data = provider.categoriesData?.data;
+
+        final cat = data!.firstWhere(
+          (c) => c.categoryId == newKey,
+          orElse: () => Datum(),
+        );
+        // print(newKey);
+
+        if (newKey == '20') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => FavoritesScreen(
+                    category: cat,
+                    color: int.parse("FF${cat.color}", radix: 16),
+                  ),
+            ),
+          );
+        } else {
+          setState(() {
+            _currentModuleKey = newKey; // update the selected category
+            toggle(left: true); // close the sidebar
+          });
+        }
+
+        // ctrl.reverse(); // animate it closed
+      },
     );
 
     return Scaffold(
@@ -120,16 +157,7 @@ class _LearnScreenState extends State<LearnScreen>
                   top: 0,
                   bottom: 0,
                   width: panelWidth,
-                  child: CategorySideBar(
-                    onCategoryTap: (String newKey) {
-                      setState(() {
-                        _currentModuleKey =
-                            newKey; // update the selected category
-                        toggle(left: true); // close the sidebar
-                      });
-                      // ctrl.reverse(); // animate it closed
-                    },
-                  ),
+                  child: sideCategories,
                 )
               else
                 Positioned(
@@ -156,20 +184,32 @@ class _LearnScreenState extends State<LearnScreen>
   }
 }
 
+class ActionIcon extends StatelessWidget {
+  final String image;
+  final VoidCallback onTap;
+  const ActionIcon({super.key, required this.image, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(icon: Image.asset(image, height: 30), onPressed: onTap);
+  }
+}
+
+/// Main content widget that displays categories and words
 class LearnContentWidget extends StatefulWidget {
   final VoidCallback onSettingsTap;
   final Widget iconWidget;
-  final String modulekey;
-  final Widget lefticon;
+  final Widget leftIcon;
   final Color color;
+  final String moduleKey;
 
   const LearnContentWidget({
-    required this.iconWidget,
-    required this.lefticon,
-    required this.onSettingsTap,
-    required this.color,
-    required this.modulekey,
     super.key,
+    required this.onSettingsTap,
+    required this.iconWidget,
+    required this.leftIcon,
+    required this.color,
+    required this.moduleKey,
   });
 
   @override
@@ -177,157 +217,158 @@ class LearnContentWidget extends StatefulWidget {
 }
 
 class _LearnContentWidgetState extends State<LearnContentWidget> {
-  /// Tracks which word is expanded per subcategory index
-  final Map<int, int?> _expandedIndexPerSub = {};
+  final Map<int, int?> _expandedPerSub = {};
 
   @override
   Widget build(BuildContext context) {
-    final lang = Localizations.localeOf(context).languageCode;
-    final provider = Provider.of<FetchDataProvider>(context);
-    final categoriesData = provider.categoriesData;
-
-    if (categoriesData?.data == null) {
-      return _buildScaffold(
-        context,
-        title: 'iLearn Papiamento',
-        child: const Center(child: Text('Data not available')),
-      );
+    final provider = context.watch<FetchDataProvider>();
+    final data = provider.categoriesData?.data;
+    if (data == null) {
+      return _buildLoading();
     }
 
-    final category = categoriesData!.data!.firstWhere(
-      (cat) => cat.categoryId == widget.modulekey,
+    final cat = data.firstWhere(
+      (c) => c.categoryId == widget.moduleKey,
       orElse: () => Datum(),
     );
-    String appbartitle = '';
-    switch (lang) {
-      case 'en':
-        appbartitle = category.categoryEng ?? '';
-        break;
-      case 'es':
-        appbartitle = category.categorySpan ?? '';
-        break;
-      case 'nl':
-        appbartitle = category.categoryDutch ?? '';
-        break;
-      case 'zh':
-        appbartitle = category.categoryChine ?? '';
-        break;
-      default:
-        appbartitle = category.categoryEng ?? '';
+    if (cat.categoryId == null) {
+      return _buildError('Category not found');
     }
 
-    if (category.categoryId == null) {
-      return _buildScaffold(
-        context,
-        title: appbartitle,
-        child: const Center(child: Text('Category not found')),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: Text(appbartitle, style: const TextStyle(color: Colors.white)),
-        centerTitle: true,
-        backgroundColor: widget.color,
-        elevation: 0,
-        leading: widget.lefticon,
-        actions: [widget.iconWidget, const SizedBox(width: 10)],
+    return Container(
+      decoration: const BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromARGB(255, 21, 21, 21),
+            spreadRadius: 3,
+            blurRadius: 6,
+          ),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: category.subcategories?.length ?? 0,
-        itemBuilder: (context, subIndex) {
-          final sub = category.subcategories![subIndex];
-          final words = sub.words ?? [];
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          centerTitle: true,
+          leading: widget.leftIcon,
+          title: Text(
+            _titleFor(cat, context),
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color(int.parse("FF${cat.color}", radix: 16)),
+          actions: [widget.iconWidget, const SizedBox(width: 10)],
+        ),
+        body: ListView.builder(
+          itemCount: cat.subcategories?.length ?? 0,
+          itemBuilder: (ctx, subIdx) {
+            final sub = cat.subcategories![subIdx];
+            final words = sub.words ?? [];
 
-          // Determine subcategory title by locale
-          final subname = () {
-            switch (lang) {
-              case 'en':
-                return sub.subcategoryEng ?? '';
-              case 'es':
-                return sub.subcategorySpan ?? '';
-              case 'nl':
-                return sub.subcategoryDutch ?? '';
-              case 'zh':
-                return sub.subcategoryChine ?? '';
-              default:
-                return sub.subcategoryEng ?? '';
-            }
-          }();
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-            child: Column(
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Subcategory heading
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 13,
-                    horizontal: 20,
-                  ),
-                  decoration: const BoxDecoration(color: Color(0xFF434343)),
+                  color: const Color(0xFF434343),
+                  padding: const EdgeInsets.all(16),
                   child: Text(
-                    subname.isNotEmpty ? subname : 'Untitled',
+                    _subTitleFor(sub, context),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
-
-                // Words list with single-expand behavior
                 ListView.builder(
-                  shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
                   itemCount: words.length,
-                  itemBuilder: (ctx, wordIndex) {
-                    final word = words[wordIndex];
-                    final isExpanded =
-                        _expandedIndexPerSub[subIndex] == wordIndex;
+                  itemBuilder: (c, wIdx) {
+                    final speed =
+                        context.watch<AppSettingsProvider>().speedValue;
+                    final autoPlay =
+                        context.watch<AppSettingsProvider>().isVoiceAuto;
+
+                    final isExp = _expandedPerSub[subIdx] == wIdx;
+                    // isFav = await FavoritesService.isFavorite(widget.word.learnContentsId!);
 
                     return CustomLearnTile(
-                      color: widget.color,
-                      word: word,
-                      isExpanded: isExpanded,
-                      onTileTap: () {
-                        setState(() {
-                          final currently = _expandedIndexPerSub[subIndex];
-                          // Toggle: collapse if same, else open new
-                          _expandedIndexPerSub[subIndex] =
-                              (currently == wordIndex) ? null : wordIndex;
-                        });
+                      isFav: context.read<FavoritesProvider>().isFavorite(
+                        words[wIdx].learnContentsId!,
+                      ),
+                      color: Color(int.parse("FF${cat.color}", radix: 16)),
+                      word: words[wIdx],
+                      isExpanded: isExp,
+                      voiceSpeed: speed,
+                      onTileTap: () async {
+                        setState(
+                          () => _expandedPerSub[subIdx] = isExp ? null : wIdx,
+                        );
+                        if (autoPlay && !isExp) {
+                          try {
+                            await context.read<AudioProvider>().play(
+                              words[wIdx].audioFile!,
+                              speed,
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        }
                       },
                     );
                   },
                 ),
               ],
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
 
-  Scaffold _buildScaffold(
-    BuildContext context, {
-    required String title,
-    required Widget child,
-  }) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title, style: const TextStyle(color: Colors.white)),
-        centerTitle: true,
-        backgroundColor: widget.color,
-        elevation: 0,
-        leading: widget.lefticon,
-        actions: [widget.iconWidget, const SizedBox(width: 10)],
-      ),
-      body: child,
-    );
+  Scaffold _buildLoading() => Scaffold(
+    appBar: AppBar(
+      backgroundColor: widget.color,
+      leading: widget.leftIcon,
+      title: const Text('Loading...', style: TextStyle(color: Colors.white)),
+    ),
+    body: const Center(child: CircularProgressIndicator()),
+  );
+
+  Scaffold _buildError(String message) => Scaffold(
+    appBar: AppBar(
+      backgroundColor: widget.color,
+      leading: widget.leftIcon,
+      title: Text(message, style: const TextStyle(color: Colors.white)),
+    ),
+    body: Center(
+      child: Text(message, style: const TextStyle(color: Colors.white)),
+    ),
+  );
+
+  String _titleFor(Datum cat, BuildContext ctx) {
+    final lang = Localizations.localeOf(ctx).languageCode;
+    return {
+          'en': cat.categoryEng,
+          'es': cat.categorySpan,
+          'nl': cat.categoryDutch,
+          'zh': cat.categoryChine,
+        }[lang] ??
+        cat.categoryEng ??
+        '';
+  }
+
+  String _subTitleFor(Subcategory sub, BuildContext ctx) {
+    final lang = Localizations.localeOf(ctx).languageCode;
+    return {
+          'en': sub.subcategoryEng,
+          'es': sub.subcategorySpan,
+          'nl': sub.subcategoryDutch,
+          'zh': sub.subcategoryChine,
+        }[lang] ??
+        sub.subcategoryEng ??
+        '';
   }
 }

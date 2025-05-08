@@ -24,7 +24,7 @@ android {
         applicationId = "com.example.ilearn_papiamento"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdkVersion(23)
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -32,10 +32,9 @@ android {
 
     buildTypes {
         getByName("release") {
-            isShrinkResources = true
-            isMinifyEnabled = true
+            isShrinkResources = false
+            isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("debug")
- 
         }
     }
 }

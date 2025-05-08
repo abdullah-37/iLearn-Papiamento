@@ -30,5 +30,6 @@
   "followontwitter": "Follow on Twitter",
   "@followontwitter": {},
   "removeads":"Remove ads",
-  "@removeads": {}
+  "@removeads": {},
+  "nofavourites":"No Favorites!"
 }

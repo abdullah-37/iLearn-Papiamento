@@ -6,6 +6,7 @@ class CustomProgressSlider extends StatefulWidget {
   final Color trackColor;
   final Color fillColor;
   final Color knobColor;
+  final double minValue;
   final double maxValue;
   final double cornerRadius;
   final double height;
@@ -17,7 +18,8 @@ class CustomProgressSlider extends StatefulWidget {
     this.trackColor = const Color(0xFF7A7D7A),
     this.fillColor = const Color(0xFFFFBB00),
     this.knobColor = const Color(0xFFB4B4B4),
-    this.maxValue = 10.0,
+    required this.minValue,
+    required this.maxValue,
     this.cornerRadius = 6.0,
     required this.height,
   });
@@ -27,14 +29,14 @@ class CustomProgressSlider extends StatefulWidget {
 }
 
 class _CustomProgressSliderState extends State<CustomProgressSlider> {
+  bool isKnobMoved = false;
+
   void _updateValueFromPosition(double x, double trackWidth) {
-    // Clamp the fraction between 0 and 1 based on the track width
     double fraction = (x / trackWidth).clamp(0.0, 1.0);
-    double value = fraction * widget.maxValue;
+    double value =
+        widget.minValue + fraction * (widget.maxValue - widget.minValue);
     widget.onChanged(value);
   }
-
-  bool isknobmoved = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,18 +44,19 @@ class _CustomProgressSliderState extends State<CustomProgressSlider> {
       builder: (context, constraints) {
         double trackWidth = constraints.maxWidth;
         double knobWidth = 18.0;
+        double knobHeight = 35.0;
 
-        // Calculate knob position and fill width based on the value
-        double left =
-            (widget.value / widget.maxValue) * (trackWidth - knobWidth);
-        double fillWidth = (widget.value / widget.maxValue) * trackWidth;
+        double range = widget.maxValue - widget.minValue;
+        double normalizedValue = (widget.value - widget.minValue) / range;
+
+        double left = normalizedValue * (trackWidth - knobWidth);
+        double fillWidth = normalizedValue * trackWidth;
 
         return GestureDetector(
           behavior: HitTestBehavior.translucent,
-
           onTapDown: (details) {
             setState(() {
-              isknobmoved = true;
+              isKnobMoved = true;
             });
             _updateValueFromPosition(details.localPosition.dx, trackWidth);
           },
@@ -62,43 +65,44 @@ class _CustomProgressSliderState extends State<CustomProgressSlider> {
           },
           onHorizontalDragEnd: (d) {
             setState(() {
-              isknobmoved = false;
+              isKnobMoved = false;
             });
           },
           child: SizedBox(
-            height: widget.height,
+            height: knobHeight,
             child: Stack(
               children: [
-                // Outer Track
-                Center(
+                Align(
+                  alignment: Alignment.center,
                   child: Container(
                     height: widget.height,
                     width: trackWidth,
                     decoration: BoxDecoration(
                       color: widget.trackColor,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(widget.cornerRadius),
                     ),
                   ),
                 ),
-                // Fill
-                Container(
-                  height: widget.height,
-                  width: fillWidth,
-                  decoration: BoxDecoration(
-                    color: widget.fillColor,
-                    borderRadius: BorderRadius.circular(6),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    height: widget.height,
+                    width: fillWidth,
+                    decoration: BoxDecoration(
+                      color: widget.fillColor,
+                      borderRadius: BorderRadius.circular(widget.cornerRadius),
+                    ),
                   ),
                 ),
-                // Draggable Knob
                 Positioned(
                   left: left,
+                  top: 0,
                   child: Container(
                     width: knobWidth,
-                    height: widget.height,
-
+                    height: knobHeight,
                     decoration: BoxDecoration(
                       color:
-                          isknobmoved
+                          isKnobMoved
                               ? const Color.fromARGB(255, 251, 202, 54)
                               : widget.knobColor,
                       borderRadius: BorderRadius.circular(6),

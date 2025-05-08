@@ -161,7 +161,7 @@ class Word {
     dutch: json["dutch"],
     chinese: json["chinese"],
     orderNumber: json["orderNumber"],
-    audioFile: json["audioId"],
+    audioFile: json["audio"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -172,6 +172,6 @@ class Word {
     "dutch": dutch,
     "chinese": chinese,
     "orderNumber": orderNumber,
-    "audioFile": audioFile,
+    "audio": audioFile,
   };
 }
