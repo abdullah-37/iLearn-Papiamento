@@ -29,7 +29,12 @@
   "@likeusonfacebook": {},
   "followontwitter": "Follow on Twitter",
   "@followontwitter": {},
-  "removeads":"Remove ads",
+  "removeads":"Remove Ads",
   "@removeads": {},
-  "nofavourites":"No Favorites!"
+  "nofavourites":"No Favorites!",
+  "settings":"Settings",
+  "get_ad_free_experience_for":"Get an ad-free experience for",
+  "buy_for":"Buy for",
+  "papiamento": "Papiamento"
+
 }

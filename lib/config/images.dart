@@ -14,4 +14,8 @@ class AppImages {
   static const String btntwitter = 'assets/images/btntwitter.png';
   static const String btnfb = 'assets/images/btnfb.png';
   static const String imgcopy = 'assets/images/imgcopy.png';
+  static const String chineseflag = 'assets/chineseflag.png';
+  static const String dutchflag = 'assets/dutchflag.png';
+  static const String englishflag = 'assets/englishflag.png';
+  static const String espanolflag = 'assets/espanolflag.png';
 }

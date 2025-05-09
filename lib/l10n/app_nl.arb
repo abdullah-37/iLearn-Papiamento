@@ -60,5 +60,12 @@
     "description": "Prompt to follow the app on Twitter"
   },
   "removeads":"Quitar anuncios",
-  "nofavourites": "¡Sin favoritos!"
+  "nofavourites": "¡Sin favoritos!",
+  "settings":"instellingen",
+  "get_ad_free_experience_for": "Krijg een advertentievrije ervaring voor",
+  "buy_for": "Koop voor",
+  "papiamento": "Papiaments"
+
+
+
 }

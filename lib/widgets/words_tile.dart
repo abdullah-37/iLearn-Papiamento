@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_icon_class/font_awesome_icon_class.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/config/images.dart';
@@ -48,13 +49,13 @@ class CustomLearnTile extends StatelessWidget {
           trailing: Consumer<FavoritesProvider>(
             builder: (context, favProv, child) {
               final isFav = favProv.isFavorite(word.learnContentsId!);
-              return IconButton(
-                icon: Icon(
+              return GestureDetector(
+                onTap: () => favProv.toggleFavorite(word),
+                child: Icon(
                   isFav ? FontAwesomeIcons.solidStar : FontAwesomeIcons.star,
                   color: isFav ? Colors.yellow : Colors.grey,
+                  size: 35,
                 ),
-                iconSize: 28,
-                onPressed: () => favProv.toggleFavorite(word),
               );
             },
           ),
@@ -95,7 +96,12 @@ class CustomLearnTile extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            ActionIcon(image: AppImages.imgcopy, onTap: () {}),
+                            ActionIcon(
+                              image: AppImages.imgcopy,
+                              onTap: () {
+                                _showCopyDialog(context, color, text);
+                              },
+                            ),
                             ActionIcon(image: AppImages.btnfb, onTap: () {}),
                             ActionIcon(
                               image: AppImages.btntwitter,
@@ -133,6 +139,63 @@ class CustomLearnTile extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+
+  void _showCopyDialog(BuildContext context, Color color, String text) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            // backgroundColor: color,
+            title: const Text(
+              'Select text to copy',
+              style: TextStyle(color: Colors.black),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildCopyTile(
+                  context,
+                  word.papiamento!,
+                  color,
+                  // "_text1 dnj urfruhf rfur fruf r friuf rgfg r fr fr frg fr ffgryfr frf rfr gf yrgfy fry fg",
+                ),
+                const SizedBox(height: 12),
+                _buildCopyTile(context, text, color),
+              ],
+            ),
+            // actions: [
+            //   TextButton(
+            //     onPressed: () => Navigator.of(context).pop(),
+            //     child: const Text('Close'),
+            //   ),
+            // ],
+          ),
+    );
+  }
+
+  Widget _buildCopyTile(BuildContext context, String text, Color color) {
+    return InkWell(
+      onTap: () async {
+        await Clipboard.setData(ClipboardData(text: text));
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Text Copied')));
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 19, color: Colors.white),
+        ),
+      ),
     );
   }
 }

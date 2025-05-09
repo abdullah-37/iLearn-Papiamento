@@ -5,6 +5,7 @@ import 'package:ilearn_papiamento/config/app_strings.dart';
 import 'package:ilearn_papiamento/config/images.dart';
 import 'package:ilearn_papiamento/providers/app_settings_provider.dart';
 import 'package:ilearn_papiamento/views/language_selection_screen.dart';
+import 'package:ilearn_papiamento/widgets/bottom_remove_Ads.dart';
 import 'package:ilearn_papiamento/widgets/slider.dart';
 import 'package:provider/provider.dart';
 
@@ -26,10 +27,10 @@ class SettingsPanelWidget extends StatelessWidget {
         selectedLanguuage = 'English' ?? '';
         break;
       case 'es':
-        selectedLanguuage = 'Dutch' ?? '';
+        selectedLanguuage = 'Espanol' ?? '';
         break;
       case 'nl':
-        selectedLanguuage = 'Espanol' ?? '';
+        selectedLanguuage = 'Dutch' ?? '';
         break;
       case 'zh':
         selectedLanguuage = '中文' ?? '';
@@ -42,7 +43,10 @@ class SettingsPanelWidget extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         // centerTitle: true,
-        title: const Text('Settings', style: TextStyle(color: Colors.white)),
+        title: Text(
+          appLocalizations.settings,
+          style: const TextStyle(color: Colors.white),
+        ),
         backgroundColor: AppColors.appBg,
         elevation: 0,
         bottom: const PreferredSize(
@@ -65,6 +69,14 @@ class SettingsPanelWidget extends StatelessWidget {
             //
             GestureDetector(
               onTap: () {
+                showRemoveAdsBottomSheet(
+                  context,
+                  backgroundColor: AppColors.appBg,
+                  titleColor: Colors.white,
+                  messageColor: Colors.white,
+                  actionTextColor: Colors.green,
+                  cancelTextColor: Colors.redAccent,
+                );
                 // purchaseProvider.buyProduct(
                 //   ProductDetails(
                 //     id: 'remove_ads',

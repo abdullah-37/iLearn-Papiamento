@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/config/config.dart';
+import 'package:ilearn_papiamento/config/images.dart';
 import 'package:ilearn_papiamento/providers/ads_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
 import 'package:ilearn_papiamento/views/favourite_screen.dart';
@@ -49,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    var adsProvider = Provider.of<AdsProvider>(context);
+    var adsProvider = context.watch<AdsProvider>(); // listens and rebuilds
     final size = MediaQuery.of(context).size;
     final panelWidth = size.width * 0.8;
     var mainContainer = MainContentWidget(
@@ -130,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen>
                     child: Column(
                       children: [
                         Expanded(child: mainContainer),
-                        adsProvider.isLoaded
+                        adsProvider.isBannerLoaded
                             ? Container(
                               color: Colors.black,
                               height:
@@ -184,7 +186,26 @@ class MainContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocalizations = AppLocalizations.of(context)!;
+
     final lang = Localizations.localeOf(context).languageCode;
+    String flagImage;
+    switch (lang) {
+      case 'en':
+        flagImage = AppImages.englishflag;
+        break;
+      case 'es':
+        flagImage = AppImages.espanolflag;
+        break;
+      case 'nl':
+        flagImage = AppImages.dutchflag;
+        break;
+      case 'zh':
+        flagImage = AppImages.chineseflag;
+        break;
+      default:
+        flagImage = AppImages.englishflag;
+    }
 
     return Container(
       decoration: const BoxDecoration(
@@ -199,9 +220,9 @@ class MainContentWidget extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
-          title: const Text(
-            'iLearn Papiamento', // Replace with AppStrings.appName
-            style: TextStyle(color: Colors.white),
+          title: Text(
+            'iLearn ${appLocalizations.papiamento}', // Replace with AppStrings.appName
+            style: const TextStyle(color: Colors.white),
           ),
           bottom: const PreferredSize(
             preferredSize: Size.fromHeight(1.0),
@@ -211,6 +232,10 @@ class MainContentWidget extends StatelessWidget {
           backgroundColor: AppColors.appBg, // Replace with AppColors.appBg
           elevation: 0,
           actions: [iconWidget, const SizedBox(width: 20)],
+          leading: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Image.asset(flagImage),
+          ),
         ),
         body: Consumer<FetchDataProvider>(
           builder: (context, provider, child) {
@@ -238,17 +263,25 @@ class MainContentWidget extends StatelessWidget {
                 switch (lang) {
                   case 'en':
                     name = category.categoryEng ?? '';
+                    flagImage = AppImages.englishflag;
                     break;
                   case 'es':
                     name = category.categorySpan ?? '';
+                    flagImage = AppImages.dutchflag;
+
                     break;
                   case 'nl':
                     name = category.categoryDutch ?? '';
+                    flagImage = AppImages.espanolflag;
+
                     break;
                   case 'zh':
                     name = category.categoryChine ?? '';
+                    flagImage = AppImages.chineseflag;
+
                   default:
                     name = category.categoryEng ?? '';
+                    flagImage = AppImages.englishflag;
                 }
                 return GestureDetector(
                   onTap: () {

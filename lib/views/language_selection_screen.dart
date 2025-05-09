@@ -31,21 +31,21 @@ class LanguageSelectionScreen extends StatelessWidget {
             },
           ),
           LanguageTile(
-            isSelected: appLanguage.locale == const Locale('es'),
+            isSelected: appLanguage.locale == const Locale('nl'),
 
             title: 'Nederland',
             subtitle: 'Dutch',
             onTap: () {
-              appLanguage.changeLanguage('es');
+              appLanguage.changeLanguage('nl');
             },
           ),
           LanguageTile(
-            isSelected: appLanguage.locale == const Locale('nl'),
+            isSelected: appLanguage.locale == const Locale('es'),
 
             title: 'Espanol',
             subtitle: 'Espanol',
             onTap: () {
-              appLanguage.changeLanguage('nl');
+              appLanguage.changeLanguage('es');
             },
           ),
           LanguageTile(
