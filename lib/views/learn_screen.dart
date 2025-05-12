@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:ilearn_papiamento/config/config.dart';
 import 'package:ilearn_papiamento/config/images.dart';
 import 'package:ilearn_papiamento/models/data_model.dart';
+import 'package:ilearn_papiamento/providers/ads_provider.dart';
 import 'package:ilearn_papiamento/providers/app_settings_provider.dart';
 import 'package:ilearn_papiamento/providers/audio_provider.dart';
+import 'package:ilearn_papiamento/providers/control_ads_provider.dart';
 import 'package:ilearn_papiamento/providers/favourite_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
 import 'package:ilearn_papiamento/views/category_side_bar.dart';
@@ -50,6 +52,13 @@ class _LearnScreenState extends State<LearnScreen>
 
   @override
   Widget build(BuildContext context) {
+    final adsProvider = Provider.of<AdsProvider>(context, listen: false);
+    final controlads = Provider.of<ControlAdsProvider>(context, listen: false);
+    if (controlads.numberOfCateOpen == 0) {
+      adsProvider.showInterstitialAd();
+    }
+
+    // Somewhere in your logic:
     final size = MediaQuery.of(context).size;
     final panelWidth = size.width * 0.8;
     // Hook both icons up to the new toggle:

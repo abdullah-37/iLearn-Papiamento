@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
+import 'package:ilearn_papiamento/providers/control_ads_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
 import 'package:ilearn_papiamento/widgets/network_image.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +12,8 @@ class CategorySideBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controlads = Provider.of<ControlAdsProvider>(context, listen: false);
+
     final lang = Localizations.localeOf(context).languageCode;
     // Use Provider.of instead of Consumer
     final provider = Provider.of<FetchDataProvider>(context, listen: false);
@@ -79,7 +82,10 @@ class CategorySideBar extends StatelessWidget {
 
                     return GestureDetector(
                       behavior: HitTestBehavior.opaque,
-                      onTap: () => onCategoryTap(category.categoryId!),
+                      onTap: () {
+                        controlads.incrementCatViews();
+                        onCategoryTap(category.categoryId!);
+                      },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Row(

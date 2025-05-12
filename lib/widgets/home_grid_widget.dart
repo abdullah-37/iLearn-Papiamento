@@ -42,6 +42,7 @@ class HomeGridWidget extends StatelessWidget {
             // 'sdsds sdsd d',
             name,
             style: const TextStyle(
+              // fontFamily: AppConfig.avenir,
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),

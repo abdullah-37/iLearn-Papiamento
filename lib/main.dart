@@ -11,8 +11,10 @@ import 'package:ilearn_papiamento/config/config.dart';
 import 'package:ilearn_papiamento/providers/ads_provider.dart';
 import 'package:ilearn_papiamento/providers/app_settings_provider.dart';
 import 'package:ilearn_papiamento/providers/audio_provider.dart';
+import 'package:ilearn_papiamento/providers/control_ads_provider.dart';
 import 'package:ilearn_papiamento/providers/favourite_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
+import 'package:ilearn_papiamento/providers/purchase_provider.dart';
 import 'package:ilearn_papiamento/views/splash_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +26,11 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ControlAdsProvider()),
+
         ChangeNotifierProvider(create: (_) => AdsProvider()),
+        ChangeNotifierProvider(create: (_) => IAPProvider()),
+
         ChangeNotifierProvider(create: (_) => AppSettingsProvider()),
         ChangeNotifierProvider(create: (_) => AudioProvider(audioService)),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
@@ -48,7 +54,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         scaffoldBackgroundColor: AppColors.appBg,
-        fontFamily: AppConfig.avenir,
+        fontFamily: AppConfig.aero,
       ),
       debugShowCheckedModeBanner: false,
       locale: appLang.locale,

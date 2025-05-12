@@ -6,6 +6,7 @@ import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/config/config.dart';
 import 'package:ilearn_papiamento/config/images.dart';
 import 'package:ilearn_papiamento/providers/ads_provider.dart';
+import 'package:ilearn_papiamento/providers/control_ads_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
 import 'package:ilearn_papiamento/views/favourite_screen.dart';
 import 'package:ilearn_papiamento/views/learn_screen.dart';
@@ -187,6 +188,7 @@ class MainContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppLocalizations appLocalizations = AppLocalizations.of(context)!;
+    final controlads = Provider.of<ControlAdsProvider>(context, listen: false);
 
     final lang = Localizations.localeOf(context).languageCode;
     String flagImage;
@@ -222,7 +224,7 @@ class MainContentWidget extends StatelessWidget {
         appBar: AppBar(
           title: Text(
             'iLearn ${appLocalizations.papiamento}', // Replace with AppStrings.appName
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white, fontSize: 23),
           ),
           bottom: const PreferredSize(
             preferredSize: Size.fromHeight(1.0),
@@ -285,6 +287,7 @@ class MainContentWidget extends StatelessWidget {
                 }
                 return GestureDetector(
                   onTap: () {
+                    controlads.incrementCatViews();
                     if (category.categoryId == '20') {
                       Navigator.push(
                         context,
