@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
 import 'package:ilearn_papiamento/providers/purchase_provider.dart';
+import 'package:ilearn_papiamento/views/dictionary_view.dart';
 import 'package:ilearn_papiamento/widgets/home_grid_widget.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
@@ -93,15 +94,41 @@ class _PremiumItemsState extends State<PremiumItems> {
               return GestureDetector(
                 onTap: () {
                   if (purchased) {
-                    // Navigate to premium content (uncomment and adjust as needed)
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (_) => PremiumContentPage(item: premiumItem),
-                    //   ),
-                    // );
+                    if (premiumItem.productId == "buy_code_3") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => DictionaryPage(
+                                color: Color(
+                                  int.parse(
+                                    "FF${premiumItem.color}",
+                                    radix: 16,
+                                  ),
+                                ),
+                              ),
+                        ),
+                      );
+                    }
                   } else {
-                    _showPurchaseSheet(context, product, iap);
+                    if (premiumItem.productId == "buy_code_3") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => DictionaryPage(
+                                color: Color(
+                                  int.parse(
+                                    "FF${premiumItem.color}",
+                                    radix: 16,
+                                  ),
+                                ),
+                              ),
+                        ),
+                      );
+                    } else {
+                      _showPurchaseSheet(context, product, iap);
+                    }
                   }
                 },
                 child: Stack(

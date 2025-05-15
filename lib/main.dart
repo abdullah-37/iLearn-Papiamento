@@ -12,6 +12,7 @@ import 'package:ilearn_papiamento/providers/ads_provider.dart';
 import 'package:ilearn_papiamento/providers/app_settings_provider.dart';
 import 'package:ilearn_papiamento/providers/audio_provider.dart';
 import 'package:ilearn_papiamento/providers/control_ads_provider.dart';
+import 'package:ilearn_papiamento/providers/dictionary_provider.dart';
 import 'package:ilearn_papiamento/providers/favourite_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
 import 'package:ilearn_papiamento/providers/purchase_provider.dart';
@@ -30,6 +31,7 @@ void main() async {
 
         ChangeNotifierProvider(create: (_) => AdsProvider()),
         ChangeNotifierProvider(create: (_) => IAPProvider()),
+        ChangeNotifierProvider(create: (_) => DictionaryProvider()),
 
         ChangeNotifierProvider(create: (_) => AppSettingsProvider()),
         ChangeNotifierProvider(create: (_) => AudioProvider(audioService)),

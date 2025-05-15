@@ -14,6 +14,8 @@ class AppConfig {
       'https://www.learnpapiamento.com/backend/api/premiumData.php';
   static const String audioBaseUrl = 'https://www.learnpapiamento.com/audios/';
   static const String imagesUrl = 'https://www.learnpapiamento.com/images/';
+  static const String dictioanyWordsUrl =
+      "https://www.learnpapiamento.com/backend/api/words.php";
 
   static const String adminUserName = 'ilearn';
   static const String adminPassword = 'shdd211as';

@@ -18,6 +18,7 @@ class CustomLearnTile extends StatelessWidget {
   final VoidCallback onTileTap;
   final double voiceSpeed;
   final bool isFav;
+  final bool isDictionary;
 
   const CustomLearnTile({
     super.key,
@@ -27,6 +28,7 @@ class CustomLearnTile extends StatelessWidget {
     required this.onTileTap,
     required this.voiceSpeed,
     required this.isFav,
+    this.isDictionary = false,
   });
 
   @override
@@ -64,7 +66,7 @@ class CustomLearnTile extends StatelessWidget {
           // titleTextStyle: const TextStyle(fontSize: 17),
           title: Text(
             // 'ss sushf fdhfdj fdfd jfdjfd  d fdjfd f dfd fd fdfd fdf df dfu ',
-            text,
+            isDictionary ? word.papiamento! : text,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -85,7 +87,7 @@ class CustomLearnTile extends StatelessWidget {
                       children: [
                         Text(
                           // 'nefh efheuf eifhefi efehfeifh f ef efi ff fhef efe ff fhefheufhef ef efeu fehfeiuh ',
-                          word.papiamento ?? '',
+                          isDictionary ? text : word.papiamento ?? '',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
