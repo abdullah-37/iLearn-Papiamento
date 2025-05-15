@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:ilearn_papiamento/Services/api_services.dart';
 import 'package:ilearn_papiamento/Services/audio_cache_service.dart';
 import 'package:ilearn_papiamento/models/data_model.dart';
+import 'package:ilearn_papiamento/models/premium_features_model.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +16,7 @@ class FetchDataProvider extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   CategoriesDataModel? categoriesData;
+  PremiumFeaturesModel? premiumFeaturesData;
   bool isLoading = false;
 
   // --- Audio playback state ---
@@ -55,10 +57,15 @@ class FetchDataProvider extends ChangeNotifier {
       if (online) {
         debugPrint('✅ Internet reachable — fetching from API');
         final res = await apiServices.fetchData();
-        if (res.success == true) {
+        final premiumres = await apiServices.fetchPremiumFeatures();
+        if (res.success == true && premiumres.success == true) {
           categoriesData = res;
+          premiumFeaturesData = premiumres;
           final jsonStr = CategoriesDataModelToJson(res);
+          final premiumJsonString = premiumDataModelToJson(premiumres);
           await prefs.setString('categories_json', jsonStr);
+          await prefs.setString('premium_categories_json', premiumJsonString);
+
           debugPrint('Fetched and cached categories');
         } else {
           debugPrint('API returned success=false; falling back to cache');
@@ -67,10 +74,12 @@ class FetchDataProvider extends ChangeNotifier {
       } else {
         debugPrint('⚠️ No internet — loading from cache');
         await _loadFromCache(prefs);
+        await _loadPremiumCache(prefs);
       }
     } catch (e) {
       debugPrint('fetchCategories error: $e — loading from cache');
       await _loadFromCache(prefs);
+      await _loadPremiumCache(prefs);
     } finally {
       isLoading = false;
       notifyListeners();
@@ -81,6 +90,18 @@ class FetchDataProvider extends ChangeNotifier {
     if (prefs.containsKey('categories_json')) {
       final jsonStr = prefs.getString('categories_json')!;
       categoriesData = CategoriesDataModelFromJson(jsonStr);
+      debugPrint('Loaded categories from cache');
+    } else {
+      debugPrint('No cached categories found');
+      categoriesData = null;
+    }
+  }
+  //
+
+  Future<void> _loadPremiumCache(SharedPreferences prefs) async {
+    if (prefs.containsKey('premium_categories_json')) {
+      final jsonStr = prefs.getString('premium_categories_json')!;
+      premiumFeaturesData = premiumDataModelFromJson(jsonStr);
       debugPrint('Loaded categories from cache');
     } else {
       debugPrint('No cached categories found');

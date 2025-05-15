@@ -1,5 +1,10 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:io';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:http/http.dart' as http;
 import 'package:ilearn_papiamento/config/config.dart';
 
 class AdsProvider with ChangeNotifier {
@@ -19,14 +24,54 @@ class AdsProvider with ChangeNotifier {
   bool _isRewardedLoaded = false;
   bool get isRewardedLoaded => _isRewardedLoaded;
 
+  // ─── Connectivity ───────────────────────────────────────────────────────────
+  final Connectivity _connectivity = Connectivity();
+  StreamSubscription<List<ConnectivityResult>>? _connSub;
+
   AdsProvider() {
-    _initBannerAd();
-    _loadInterstitialAd();
-    _loadRewardedAd();
+    _connSub = _connectivity.onConnectivityChanged.listen(
+      _onConnectivityChanged,
+    );
+    _attemptLoadIfOnline();
   }
 
-  // ─── Banner Ad Init ─────────────────────────────────────────────────────────
+  Future<void> _onConnectivityChanged(List<ConnectivityResult> result) async {
+    if (result[0] != ConnectivityResult.none) {
+      await _attemptLoadIfOnline();
+    }
+  }
+
+  /// Returns true only if we can reach a real endpoint.
+  Future<bool> _hasInternet({int timeoutSeconds = 3}) async {
+    try {
+      final uri = Uri.https('www.google.com', '/');
+      final resp = await http
+          .head(uri)
+          .timeout(Duration(seconds: timeoutSeconds));
+      return resp.statusCode == HttpStatus.ok ||
+          resp.statusCode == HttpStatus.found;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> _attemptLoadIfOnline() async {
+    if (await _hasInternet()) {
+      _tryLoadAllAds();
+    } else {
+      debugPrint('No actual Internet—skipping ad load/retry');
+    }
+  }
+
+  void _tryLoadAllAds() {
+    if (!_isBannerLoaded) _initBannerAd();
+    if (!_isInterstitialLoaded) _loadInterstitialAd();
+    if (!_isRewardedLoaded) _loadRewardedAd();
+  }
+
   void _initBannerAd() {
+    _bannerAd?.dispose();
+    _isBannerLoaded = false;
     _bannerAd = BannerAd(
       size: AdSize.banner,
       adUnitId: AppConfig.bannerAdUnitId,
@@ -34,19 +79,20 @@ class AdsProvider with ChangeNotifier {
         onAdLoaded: (_) {
           _isBannerLoaded = true;
           notifyListeners();
-          debugPrint('BannerAd loaded');
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
-          debugPrint('BannerAd failed: $error');
+          _isBannerLoaded = false;
+          debugPrint('Banner failed: $error');
         },
       ),
       request: const AdRequest(),
     )..load();
   }
 
-  // ─── Interstitial Ad ────────────────────────────────────────────────────────
   void _loadInterstitialAd() {
+    _interstitialAd?.dispose();
+    _isInterstitialLoaded = false;
     InterstitialAd.load(
       adUnitId: AppConfig.interstitialAdUnitId,
       request: const AdRequest(),
@@ -54,45 +100,39 @@ class AdsProvider with ChangeNotifier {
         onAdLoaded: (ad) {
           _interstitialAd = ad;
           _isInterstitialLoaded = true;
-          // set up lifecycle callbacks
           ad.setImmersiveMode(true);
           ad.fullScreenContentCallback = FullScreenContentCallback(
             onAdDismissedFullScreenContent: (ad) {
               ad.dispose();
               _isInterstitialLoaded = false;
-              _loadInterstitialAd(); // preload next
+              _loadInterstitialAd();
               notifyListeners();
             },
             onAdFailedToShowFullScreenContent: (ad, error) {
               ad.dispose();
               _isInterstitialLoaded = false;
               _loadInterstitialAd();
-              debugPrint('Interstitial failed to show: $error');
             },
           );
           notifyListeners();
-          debugPrint('InterstitialAd loaded');
         },
         onAdFailedToLoad: (error) {
-          debugPrint('InterstitialAd failed to load: $error');
           _isInterstitialLoaded = false;
-          // you might retry with a delay here
+          debugPrint('Interstitial failed: $error');
         },
       ),
     );
   }
 
-  /// Call this to show an interstitial if loaded.
   void showInterstitialAd() {
     if (_isInterstitialLoaded && _interstitialAd != null) {
       _interstitialAd!.show();
-    } else {
-      debugPrint('InterstitialAd is not ready yet.');
     }
   }
 
-  // ─── Rewarded Ad ────────────────────────────────────────────────────────────
   void _loadRewardedAd() {
+    _rewardedAd?.dispose();
+    _isRewardedLoaded = false;
     RewardedAd.load(
       adUnitId: AppConfig.rewardedAdUnitId,
       request: const AdRequest(),
@@ -111,35 +151,29 @@ class AdsProvider with ChangeNotifier {
               ad.dispose();
               _isRewardedLoaded = false;
               _loadRewardedAd();
-              debugPrint('RewardedAd failed to show: $error');
             },
           );
           notifyListeners();
-          debugPrint('RewardedAd loaded');
         },
         onAdFailedToLoad: (error) {
-          debugPrint('RewardedAd failed to load: $error');
           _isRewardedLoaded = false;
-          // optional retry logic
+          debugPrint('Rewarded failed: $error');
         },
       ),
     );
   }
 
-  /// Call this to show a rewarded ad.
-  /// [onUserEarnedReward] is your callback to actually grant the user their reward.
   void showRewardedAd({
     required OnUserEarnedRewardCallback onUserEarnedReward,
   }) {
     if (_isRewardedLoaded && _rewardedAd != null) {
       _rewardedAd!.show(onUserEarnedReward: onUserEarnedReward);
-    } else {
-      debugPrint('RewardedAd is not ready yet.');
     }
   }
 
   @override
   void dispose() {
+    _connSub?.cancel();
     _bannerAd?.dispose();
     _interstitialAd?.dispose();
     _rewardedAd?.dispose();

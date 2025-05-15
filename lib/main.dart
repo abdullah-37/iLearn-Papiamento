@@ -54,15 +54,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         scaffoldBackgroundColor: AppColors.appBg,
-        fontFamily: AppConfig.aero,
+        fontFamily: AppConfig.avenir,
       ),
       debugShowCheckedModeBanner: false,
       locale: appLang.locale,
       supportedLocales: const [
-        Locale('en'), // Spanish
-        Locale('es'), // Dutch
-        Locale('nl'), // Spanish
-        Locale('zh'), // Dutch
+        Locale('en'),
+        Locale('es'),
+        Locale('nl'),
+        Locale('zh'),
       ],
       localizationsDelegates: const [
         AppLocalizations.delegate,

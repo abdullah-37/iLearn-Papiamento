@@ -10,6 +10,8 @@ class AppConfig {
 
   static const String baseUrl =
       'https://www.learnpapiamento.com/backend/api/getData.php';
+  static const String premiumfeaturesbaseUrl =
+      'https://www.learnpapiamento.com/backend/api/premiumData.php';
   static const String audioBaseUrl = 'https://www.learnpapiamento.com/audios/';
   static const String imagesUrl = 'https://www.learnpapiamento.com/images/';
 

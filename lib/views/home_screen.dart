@@ -8,9 +8,11 @@ import 'package:ilearn_papiamento/config/images.dart';
 import 'package:ilearn_papiamento/providers/ads_provider.dart';
 import 'package:ilearn_papiamento/providers/control_ads_provider.dart';
 import 'package:ilearn_papiamento/providers/fetch_data_provider.dart';
+import 'package:ilearn_papiamento/providers/purchase_provider.dart';
 import 'package:ilearn_papiamento/views/favourite_screen.dart';
 import 'package:ilearn_papiamento/views/learn_screen.dart';
 import 'package:ilearn_papiamento/views/settings_screen.dart';
+import 'package:ilearn_papiamento/widgets/Premium_Items_grid.dart.dart';
 import 'package:ilearn_papiamento/widgets/home_grid_widget.dart';
 import 'package:ilearn_papiamento/widgets/line_below_appbar.dart';
 import 'package:provider/provider.dart';
@@ -53,6 +55,8 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     var adsProvider = context.watch<AdsProvider>(); // listens and rebuilds
+    final adsRemoved = context.watch<IAPProvider>().adsRemoved;
+
     final size = MediaQuery.of(context).size;
     final panelWidth = size.width * 0.8;
     var mainContainer = MainContentWidget(
@@ -133,16 +137,18 @@ class _HomeScreenState extends State<HomeScreen>
                     child: Column(
                       children: [
                         Expanded(child: mainContainer),
-                        adsProvider.isBannerLoaded
-                            ? Container(
-                              color: Colors.black,
-                              height:
-                                  adsProvider.bannerAd!.size.height.toDouble(),
-                              width: double.infinity,
-                              // adsProvider.bannerAd!.size.width.toDouble(),
-                              child: AdWidget(ad: adsProvider.bannerAd!),
-                            )
-                            : const SizedBox.shrink(),
+                        if (!adsRemoved)
+                          adsProvider.isBannerLoaded
+                              ? Container(
+                                color: Colors.black,
+                                height:
+                                    adsProvider.bannerAd!.size.height
+                                        .toDouble(),
+                                width: double.infinity,
+                                // adsProvider.bannerAd!.size.width.toDouble(),
+                                child: AdWidget(ad: adsProvider.bannerAd!),
+                              )
+                              : const SizedBox.shrink(),
                       ],
                     ),
                   ),
@@ -188,7 +194,7 @@ class MainContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppLocalizations appLocalizations = AppLocalizations.of(context)!;
-    final controlads = Provider.of<ControlAdsProvider>(context, listen: false);
+    final controlads = Provider.of<ControlAdsProvider>(context, listen: true);
 
     final lang = Localizations.localeOf(context).languageCode;
     String flagImage;
@@ -224,7 +230,11 @@ class MainContentWidget extends StatelessWidget {
         appBar: AppBar(
           title: Text(
             'iLearn ${appLocalizations.papiamento}', // Replace with AppStrings.appName
-            style: const TextStyle(color: Colors.white, fontSize: 23),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 23,
+              fontFamily: AppConfig.aero,
+            ),
           ),
           bottom: const PreferredSize(
             preferredSize: Size.fromHeight(1.0),
@@ -249,78 +259,102 @@ class MainContentWidget extends StatelessWidget {
               return const Center(child: Text('Failed to load categories'));
             }
             final categories = provider.categoriesData!.data!;
-            return GridView.builder(
-              shrinkWrap: true,
+            return ListView(
               padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 1,
-                crossAxisSpacing: 13,
-                mainAxisSpacing: 13,
-              ),
-              itemCount: categories.length,
-              itemBuilder: (context, i) {
-                final category = categories[i];
-                String name;
-                switch (lang) {
-                  case 'en':
-                    name = category.categoryEng ?? '';
-                    flagImage = AppImages.englishflag;
-                    break;
-                  case 'es':
-                    name = category.categorySpan ?? '';
-                    flagImage = AppImages.dutchflag;
+              children: [
+                GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 1,
+                    crossAxisSpacing: 13,
+                    mainAxisSpacing: 13,
+                  ),
+                  itemCount: categories.length,
+                  itemBuilder: (context, i) {
+                    final category = categories[i];
+                    String name;
+                    switch (lang) {
+                      case 'en':
+                        name = category.categoryEng ?? '';
+                        flagImage = AppImages.englishflag;
+                        break;
+                      case 'es':
+                        name = category.categorySpan ?? '';
+                        flagImage = AppImages.dutchflag;
 
-                    break;
-                  case 'nl':
-                    name = category.categoryDutch ?? '';
-                    flagImage = AppImages.espanolflag;
+                        break;
+                      case 'nl':
+                        name = category.categoryDutch ?? '';
+                        flagImage = AppImages.espanolflag;
 
-                    break;
-                  case 'zh':
-                    name = category.categoryChine ?? '';
-                    flagImage = AppImages.chineseflag;
+                        break;
+                      case 'zh':
+                        name = category.categoryChine ?? '';
+                        flagImage = AppImages.chineseflag;
 
-                  default:
-                    name = category.categoryEng ?? '';
-                    flagImage = AppImages.englishflag;
-                }
-                return GestureDetector(
-                  onTap: () {
-                    controlads.incrementCatViews();
-                    if (category.categoryId == '20') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => FavoritesScreen(
-                                category: category,
-                                color: int.parse(
-                                  "FF${category.color}",
-                                  radix: 16,
-                                ),
-                              ),
-                        ),
-                      );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (_) => LearnScreen(
-                                color: int.parse(
-                                  "FF${category.color}",
-                                  radix: 16,
-                                ),
-                                moduleKey: category.categoryId ?? '',
-                              ),
-                        ),
-                      );
+                      default:
+                        name = category.categoryEng ?? '';
+                        flagImage = AppImages.englishflag;
                     }
+                    return GestureDetector(
+                      onTap: () {
+                        controlads.incrementCatViews();
+                        if (category.categoryId == '20') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => FavoritesScreen(
+                                    category: category,
+                                    color: int.parse(
+                                      "FF${category.color}",
+                                      radix: 16,
+                                    ),
+                                  ),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => LearnScreen(
+                                    color: int.parse(
+                                      "FF${category.color}",
+                                      radix: 16,
+                                    ),
+                                    moduleKey: category.categoryId ?? '',
+                                  ),
+                            ),
+                          );
+                        }
+                      },
+                      child: HomeGridWidget(category: category),
+                    );
                   },
-                  child: HomeGridWidget(category: category),
-                );
-              },
+                ),
+                const SizedBox(height: 20),
+
+                // Premium Features
+                Container(
+                  height: 50,
+                  color: AppColors.learnTileopenedbg,
+                  child: const Center(
+                    child: Text(
+                      'Premium Features',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                const PremiumItems(),
+
+                // //remove adds
+                // //
+              ],
             );
           },
         ),

@@ -4,6 +4,7 @@ import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/config/app_strings.dart';
 import 'package:ilearn_papiamento/config/images.dart';
 import 'package:ilearn_papiamento/providers/app_settings_provider.dart';
+import 'package:ilearn_papiamento/providers/purchase_provider.dart';
 import 'package:ilearn_papiamento/views/language_selection_screen.dart';
 import 'package:ilearn_papiamento/widgets/slider.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,8 @@ class SettingsPanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final adsProvider = Provider.of<IAPProvider>(context, listen: false);
+
     final lang = Localizations.localeOf(context).languageCode;
 
     String selectedLanguuage = 'English';
@@ -60,39 +63,40 @@ class SettingsPanelWidget extends StatelessWidget {
           spacing: 15,
           children: [
             //
-            // CustomSettingContainer(
-            //   title: appLocalizations.extras,
-            //   color: const Color(0xFFCB7954),
-            //   height: height,
-            // ),
-            // //
-            // GestureDetector(
-            //   onTap: () {
-            //     showRemoveAdsBottomSheet(
-            //       context,
-            //       backgroundColor: AppColors.appBg,
-            //       titleColor: Colors.white,
-            //       messageColor: Colors.white,
-            //       actionTextColor: Colors.green,
-            //       cancelTextColor: Colors.redAccent,
-            //     );
-            //     // purchaseProvider.buyProduct(
-            //     //   ProductDetails(
-            //     //     id: 'remove_ads',
-            //     //     title: 'Remove Ads',
-            //     //     description: 'This will remove adds',
-            //     //     price: '300',
-            //     //     rawPrice: 300.00,
-            //     //     currencyCode: 'Rs',
-            //     //   ),
-            //     //   consumable: false,
-            //     // );
-            //   },
-            //   child: Padding(
-            //     padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            //     child: CustomSettingText(text: appLocalizations.removeads),
-            //   ),
-            // ),
+            CustomSettingContainer(
+              title: appLocalizations.extras,
+              color: const Color(0xFFCB7954),
+              height: height,
+            ),
+            //
+            GestureDetector(
+              onTap: () {
+                adsProvider.loadProducts({'buy_code_3'});
+                // showRemoveAdsBottomSheet(
+                //   context,
+                //   backgroundColor: AppColors.appBg,
+                //   titleColor: Colors.white,
+                //   messageColor: Colors.white,
+                //   actionTextColor: Colors.green,
+                //   cancelTextColor: Colors.redAccent,
+                // );
+                // purchaseProvider.buyProduct(
+                //   ProductDetails(
+                //     id: 'remove_ads',
+                //     title: 'Remove Ads',
+                //     description: 'This will remove adds',
+                //     price: '300',
+                //     rawPrice: 300.00,
+                //     currencyCode: 'Rs',
+                //   ),
+                //   consumable: false,
+                // );
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: CustomSettingText(text: appLocalizations.removeads),
+              ),
+            ),
             CustomSettingContainer(
               title: appLocalizations.languages,
               color: const Color(0xFFCB7954),

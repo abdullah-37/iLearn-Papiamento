@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ilearn_papiamento/models/data_model.dart';
 import 'package:ilearn_papiamento/widgets/network_image.dart';
 
 class HomeGridWidget extends StatelessWidget {
-  final Datum category;
+  final dynamic category;
 
   const HomeGridWidget({super.key, required this.category});
 
@@ -36,11 +35,12 @@ class HomeGridWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CustomNetworkImageWidget(imagePath: category.image!, imageHeight: 40),
+          Flexible(child: CustomNetworkImageWidget(imagePath: category.image!)),
           const SizedBox(height: 8),
           Text(
             // 'sdsds sdsd d',
             name,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               // fontFamily: AppConfig.avenir,
               color: Colors.white,
