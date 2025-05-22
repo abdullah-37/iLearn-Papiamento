@@ -18,4 +18,6 @@ class AppImages {
   static const String dutchflag = 'assets/dutchflag.png';
   static const String englishflag = 'assets/englishflag.png';
   static const String espanolflag = 'assets/espanolflag.png';
+  static const String removeads = 'assets/removeads.png';
+  static const String dictionary = 'assets/dictionary.png';
 }

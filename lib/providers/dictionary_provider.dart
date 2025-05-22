@@ -19,6 +19,10 @@ class DictionaryProvider with ChangeNotifier {
   List<Word> get searchResults => List.unmodifiable(_searchResults);
   bool get isLoading => _isLoading;
   String _lastQuery = '';
+  String _selectedLanguage = 'papiamento'; // Default language
+
+  // Getter for selected language
+  String get selectedLanguage => _selectedLanguage;
 
   DictionaryProvider()
     : _dio = Dio(
@@ -31,6 +35,13 @@ class DictionaryProvider with ChangeNotifier {
         ),
       ) {
     fetchNextPage();
+  }
+
+  // Method to set the selected language and update search results
+  void setSelectedLanguage(String language) {
+    _selectedLanguage = language;
+    // _updateSearchResults();
+    // notifyListeners();
   }
 
   Future<void> fetchNextPage() async {
@@ -65,7 +76,7 @@ class DictionaryProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Updates searchResults based on lastQuery
+  /// Updates searchResults based on lastQuery and selectedLanguage
   void _updateSearchResults() {
     _searchResults.clear();
     if (_lastQuery.isEmpty) {
@@ -73,7 +84,12 @@ class DictionaryProvider with ChangeNotifier {
     } else {
       _searchResults.addAll(
         _words.where(
-          (w) => w.papiamento?.toLowerCase().contains(_lastQuery) ?? false,
+          (w) =>
+              w
+                  .getWordInLanguage(_selectedLanguage)
+                  ?.toLowerCase()
+                  .contains(_lastQuery) ??
+              false,
         ),
       );
     }

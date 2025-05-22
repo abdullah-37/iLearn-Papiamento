@@ -17,7 +17,7 @@ class SettingsPanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final adsProvider = Provider.of<IAPProvider>(context, listen: false);
+    // final adsProvider = Provider.of<IAPProvider>(context, listen: false);
 
     final lang = Localizations.localeOf(context).languageCode;
 
@@ -71,7 +71,7 @@ class SettingsPanelWidget extends StatelessWidget {
             //
             GestureDetector(
               onTap: () {
-                adsProvider.loadProducts({'buy_code_3'});
+                // adsProvider.loadProducts({'buy_code_3'});
                 // showRemoveAdsBottomSheet(
                 //   context,
                 //   backgroundColor: AppColors.appBg,

@@ -50,7 +50,7 @@ class AppSettingsProvider extends ChangeNotifier {
   // Auto Play
 
   Future<void> loadAutoVoice() async {
-    _isVoiceAuto = SharedPrefsService.getBool(AppConfig.autoPlay) ?? false;
+    _isVoiceAuto = SharedPrefsService.getBool(AppConfig.autoPlay) ?? true;
     notifyListeners();
   }
 

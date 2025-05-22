@@ -12,8 +12,8 @@ import 'package:ilearn_papiamento/providers/purchase_provider.dart';
 import 'package:ilearn_papiamento/views/favourite_screen.dart';
 import 'package:ilearn_papiamento/views/learn_screen.dart';
 import 'package:ilearn_papiamento/views/settings_screen.dart';
-import 'package:ilearn_papiamento/widgets/Premium_Items_grid.dart.dart';
-import 'package:ilearn_papiamento/widgets/home_grid_widget.dart';
+import 'package:ilearn_papiamento/widgets/Premium_Items.dart';
+import 'package:ilearn_papiamento/widgets/home_grid_widget.dart' as homegrid;
 import 'package:ilearn_papiamento/widgets/line_below_appbar.dart';
 import 'package:provider/provider.dart';
 
@@ -54,8 +54,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    var adsProvider = context.watch<AdsProvider>(); // listens and rebuilds
-    final adsRemoved = context.watch<IAPProvider>().adsRemoved;
+    var adsProvider = context.watch<AdsProvider>();
+    var isadsremoved = context.watch<PurchaseProvider>().isRemoveAdsPurchased;
 
     final size = MediaQuery.of(context).size;
     final panelWidth = size.width * 0.8;
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen>
                     child: Column(
                       children: [
                         Expanded(child: mainContainer),
-                        if (!adsRemoved)
+                        if (!isadsremoved)
                           adsProvider.isBannerLoaded
                               ? Container(
                                 color: Colors.black,
@@ -331,7 +331,7 @@ class MainContentWidget extends StatelessWidget {
                           );
                         }
                       },
-                      child: HomeGridWidget(category: category),
+                      child: homegrid.HomeGridWidget(category: category),
                     );
                   },
                 ),

@@ -174,4 +174,20 @@ class Word {
     "orderNumber": orderNumber,
     "audio": audioFile,
   };
+
+  // Method to get the word text based on the selected language
+  String? getWordInLanguage(String language) {
+    switch (language) {
+      case 'en':
+        return english;
+      case 'es':
+        return spanish;
+      case 'nl':
+        return dutch;
+      case 'zh':
+        return chinese;
+      default:
+        return english;
+    }
+  }
 }

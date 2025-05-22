@@ -35,16 +35,21 @@ class HomeGridWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Flexible(child: CustomNetworkImageWidget(imagePath: category.image!)),
+          Expanded(
+            flex: 2,
+            child: CustomNetworkImageWidget(imagePath: category.image!),
+          ),
           const SizedBox(height: 8),
-          Text(
-            // 'sdsds sdsd d',
-            name,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              // fontFamily: AppConfig.avenir,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+          FittedBox(
+            child: Text(
+              // 'sdsddddssss sdsd d',
+              name,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                // fontFamily: AppConfig.avenir,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

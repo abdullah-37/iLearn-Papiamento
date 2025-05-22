@@ -30,7 +30,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ControlAdsProvider()),
 
         ChangeNotifierProvider(create: (_) => AdsProvider()),
-        ChangeNotifierProvider(create: (_) => IAPProvider()),
+        ChangeNotifierProvider(create: (_) => PurchaseProvider()),
         ChangeNotifierProvider(create: (_) => DictionaryProvider()),
 
         ChangeNotifierProvider(create: (_) => AppSettingsProvider()),

@@ -1,145 +1,119 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:ilearn_papiamento/config/images.dart';
 
-/// Manages in-app purchases with dynamic product loading and state management.
-class IAPProvider with ChangeNotifier {
+const String removeAdsMonthlyId = 'buy_code_1';
+const String removeAdsYearlyId = 'buy_code_3';
+const String dictionaryMonthlyId = 'buy_code_4';
+const String dictionaryYearlyId = 'buy_code_5';
+
+class Category {
+  final String name;
+  final List<String> grantingProductIds;
+  final String image;
+  final Color color;
+
+  Category({
+    required this.name,
+    required this.grantingProductIds,
+    required this.color,
+    required this.image,
+  });
+}
+
+class PurchaseProvider with ChangeNotifier {
   final InAppPurchase _iap = InAppPurchase.instance;
-  late final StreamSubscription<List<PurchaseDetails>> _subscription;
-
-  // Loading states
-  bool _isInitializing = false;
-  bool _isLoadingProducts = false;
-  bool _isPurchasing = false;
-  bool _adsRemoved = false;
-  bool get adsRemoved => _adsRemoved;
-
-  bool get isInitializing => _isInitializing;
-  bool get isLoadingProducts => _isLoadingProducts;
-  bool get isPurchasing => _isPurchasing;
-
-  /// Available products fetched from store
   List<ProductDetails> _products = [];
-  List<ProductDetails> get products => _products;
-
-  /// Past and current purchases
   List<PurchaseDetails> _purchases = [];
-  List<PurchaseDetails> get purchases => _purchases;
+  List<Category> _categories = [];
+  bool _isRemoveAdsPurchased = false;
 
-  bool _isAvailable = false;
-  bool get isAvailable => _isAvailable;
-
-  IAPProvider() {
-    _init();
+  PurchaseProvider() {
+    _initialize();
+    _iap.purchaseStream.listen((purchases) {
+      _purchases = purchases;
+      checkRemoveAdsPurchased();
+      notifyListeners();
+    });
   }
 
-  Future<void> _init() async {
-    _isInitializing = true;
+  Future<void> _initialize() async {
+    await loadProducts();
+    await restorePurchases();
+    _setupCategories();
+    checkRemoveAdsPurchased();
     notifyListeners();
+  }
 
-    // Subscribe to purchase updates
-    _subscription = _iap.purchaseStream.listen(
-      (purchases) {
-        _purchases = purchases;
-        _updateAdsRemoved(); // ← check here
-
-        notifyListeners(); // Ensure UI updates on purchase changes
-      },
-      onDone: () => _subscription.cancel(),
-      onError: (error) => debugPrint('IAP Stream Error: $error'),
+  //
+  void checkRemoveAdsPurchased() {
+    final bool isp = _purchases.any(
+      (purchase) =>
+          purchase.productID == removeAdsMonthlyId ||
+          purchase.productID == removeAdsYearlyId &&
+              purchase.status == PurchaseStatus.purchased,
     );
-
-    _isAvailable = await _iap.isAvailable();
-    if (_isAvailable) {
-      // 3. Query past (restored) purchases
-      await _iap.restorePurchases();
-    }
-    _isInitializing = false;
-    notifyListeners();
-  }
-
-  /// Load products dynamically by their IDs
-  Future<void> loadProducts(Set<String> productIds) async {
-    if (productIds.isEmpty) {
-      debugPrint('No valid product IDs to load');
-      return;
-    }
-
-    _isLoadingProducts = true;
-    notifyListeners();
-
-    final response = await _iap.queryProductDetails(productIds);
-    if (response.error != null) {
-      debugPrint('Product query error: ${response.error}');
-      _products = [];
-    } else {
-      _products = response.productDetails;
-      if (_products.isNotEmpty) {
-        debugPrint('Loaded products: ${_products.map((p) => p.id).join(', ')}');
-      }
-    }
-
-    _isLoadingProducts = false;
-    notifyListeners();
-  }
-
-  /// Initiate a purchase
-  Future<void> buyProduct(
-    ProductDetails product, {
-    bool consumable = false,
-  }) async {
-    _isPurchasing = true;
-    notifyListeners();
-
-    try {
-      final param = PurchaseParam(productDetails: product);
-      bool success =
-          consumable
-              ? await _iap.buyConsumable(purchaseParam: param)
-              : await _iap.buyNonConsumable(purchaseParam: param);
-      if (success) {
-        _verifyPurchase(product.id);
-      }
-    } catch (e) {
-      debugPrint('Purchase error: $e');
-    } finally {
-      _isPurchasing = false;
+    if (isp) {
+      _isRemoveAdsPurchased = true;
       notifyListeners();
     }
   }
 
-  /// Verify and complete purchases
-  void _verifyPurchase(String productId) {
-    for (final purchase in _purchases) {
-      if (purchase.productID == productId &&
-          purchase.status == PurchaseStatus.purchased &&
-          !purchase.pendingCompletePurchase) {
-        _iap.completePurchase(purchase);
-        debugPrint('Purchase completed for product: $productId');
-      }
-    }
+  //
+  Future<void> loadProducts() async {
+    final bool available = await _iap.isAvailable();
+    if (!available) return;
+    const Set<String> ids = {
+      removeAdsMonthlyId,
+      removeAdsYearlyId,
+      dictionaryMonthlyId,
+      dictionaryYearlyId,
+    };
+    final ProductDetailsResponse response = await _iap.queryProductDetails(ids);
+    _products = response.productDetails;
+    notifyListeners();
   }
 
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
+  Future<void> restorePurchases() async {
+    final bool available = await _iap.isAvailable();
+    if (!available) return;
+    await _iap.restorePurchases();
   }
 
-  /// Call this whenever _purchases changes (stream, restore, etc.)
-  void _updateAdsRemoved() {
-    // Replace 'remove_ads' with your actual product ID
-    // _adsRemoved = true;
-    _adsRemoved = _purchases.any(
-      (p) =>
-          p.productID == 'remove_ads' && p.status == PurchaseStatus.purchased,
+  bool isPurchased(List<String> productIds) {
+    return productIds.any(
+      (id) => _purchases.any(
+        (purchase) =>
+            purchase.productID == id &&
+            purchase.status == PurchaseStatus.purchased,
+      ),
     );
   }
 
-  /// Public method if you ever need to manually re-check (e.g. on app start)
-  void checkAdsRemoved() {
-    _updateAdsRemoved();
-    notifyListeners();
+  Future<void> buyProduct(ProductDetails product) async {
+    final PurchaseParam purchaseParam = PurchaseParam(productDetails: product);
+    await _iap.buyNonConsumable(purchaseParam: purchaseParam);
   }
+
+  void _setupCategories() {
+    _categories = [
+      Category(
+        name: 'Remove Ads',
+        grantingProductIds: [removeAdsMonthlyId, removeAdsYearlyId],
+        color: const Color.fromARGB(255, 188, 204, 16),
+        image: AppImages.removeads,
+      ),
+      Category(
+        name: 'Dictionary',
+        grantingProductIds: [dictionaryMonthlyId, dictionaryYearlyId],
+        color: const Color.fromARGB(255, 1, 163, 131),
+        image: AppImages.dictionary,
+      ),
+    ];
+  }
+
+  // Getters
+  List<Category> get categories => _categories;
+  List<ProductDetails> get products => _products;
+  bool get isRemoveAdsPurchased => _isRemoveAdsPurchased;
 }

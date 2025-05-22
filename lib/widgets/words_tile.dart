@@ -28,7 +28,7 @@ class CustomLearnTile extends StatelessWidget {
     required this.onTileTap,
     required this.voiceSpeed,
     required this.isFav,
-    this.isDictionary = false,
+    required this.isDictionary,
   });
 
   @override
@@ -66,7 +66,7 @@ class CustomLearnTile extends StatelessWidget {
           // titleTextStyle: const TextStyle(fontSize: 17),
           title: Text(
             // 'ss sushf fdhfdj fdfd jfdjfd  d fdjfd f dfd fd fdfd fdf df dfu ',
-            isDictionary ? word.papiamento! : text,
+            text,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -87,7 +87,7 @@ class CustomLearnTile extends StatelessWidget {
                       children: [
                         Text(
                           // 'nefh efheuf eifhefi efehfeifh f ef efi ff fhef efe ff fhefheufhef ef efeu fehfeiuh ',
-                          isDictionary ? text : word.papiamento ?? '',
+                          word.papiamento ?? '',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -112,15 +112,25 @@ class CustomLearnTile extends StatelessWidget {
                             ActionIcon(
                               image: AppImages.btnspeaker,
                               onTap: () async {
-                                try {
-                                  await context.read<AudioProvider>().play(
-                                    word.audioFile!,
-                                    voiceSpeed,
-                                  );
-                                } catch (e) {
+                                if (isDictionary) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(e.toString())),
+                                    const SnackBar(
+                                      content: Text(
+                                        "Voices are not available for Dictionary",
+                                      ),
+                                    ),
                                   );
+                                } else {
+                                  try {
+                                    await context.read<AudioProvider>().play(
+                                      word.audioFile!,
+                                      voiceSpeed,
+                                    );
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(e.toString())),
+                                    );
+                                  }
                                 }
                               },
                             ),

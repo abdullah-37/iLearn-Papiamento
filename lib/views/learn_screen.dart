@@ -302,6 +302,7 @@ class _LearnContentWidgetState extends State<LearnContentWidget> {
                     // isFav = await FavoritesService.isFavorite(widget.word.learnContentsId!);
 
                     return CustomLearnTile(
+                      isDictionary: false,
                       isFav: context.read<FavoritesProvider>().isFavorite(
                         words[wIdx].learnContentsId!,
                       ),

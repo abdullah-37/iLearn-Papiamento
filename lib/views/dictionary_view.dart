@@ -21,6 +21,9 @@ class _DictionaryPageState extends State<DictionaryPage> {
   @override
   Widget build(BuildContext context) {
     // 3️⃣ Use .value so it doesn’t try to recreate it
+    final lang = context.read<AppSettingsProvider>().locale.languageCode;
+    context.read<DictionaryProvider>().setSelectedLanguage(lang);
+
     return Scaffold(
       backgroundColor: AppColors.appBg,
       appBar: AppBar(

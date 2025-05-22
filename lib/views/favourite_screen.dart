@@ -77,6 +77,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
                     // Display the appropriate localized text if available
                     return CustomLearnTile(
+                      isDictionary: false,
                       isFav: context.read<FavoritesProvider>().isFavorite(
                         word.learnContentsId!,
                       ),

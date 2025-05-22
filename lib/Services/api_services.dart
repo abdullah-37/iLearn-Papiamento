@@ -50,34 +50,34 @@ class ApiServices {
     }
   }
 
-  // Fetch Premium Seices
-  Future<PremiumFeaturesModel> fetchPremiumFeatures() async {
-    try {
-      var response = await dio.get(AppConfig.premiumfeaturesbaseUrl);
+  // // Fetch Premium Seices
+  // Future<PremiumFeaturesModel> fetchPremiumFeatures() async {
+  //   try {
+  //     var response = await dio.get(AppConfig.premiumfeaturesbaseUrl);
 
-      // Check if response and success field are valid
-      if (response.data == null || response.data['success'] == null) {
-        throw 'Invalid response: Missing success field';
-      }
+  //     // Check if response and success field are valid
+  //     if (response.data == null || response.data['success'] == null) {
+  //       throw 'Invalid response: Missing success field';
+  //     }
 
-      // Handle success == true
-      if (response.data['success'] == true) {
-        print(response.data);
-        return PremiumFeaturesModel.fromJson(response.data);
-      }
+  //     // Handle success == true
+  //     if (response.data['success'] == true) {
+  //       print(response.data);
+  //       return PremiumFeaturesModel.fromJson(response.data);
+  //     }
 
-      // Handle success == false
-      if (response.data['success'] == false) {
-        throw 'Response success is false';
-      }
+  //     // Handle success == false
+  //     if (response.data['success'] == false) {
+  //       throw 'Response success is false';
+  //     }
 
-      // Handle unexpected success value
-      throw 'Unexpected response: success field is neither true nor false';
-    } catch (e) {
-      print('Error fetching data: $e');
-      rethrow; // Rethrow to let the caller handle the error
-    }
-  }
+  //     // Handle unexpected success value
+  //     throw 'Unexpected response: success field is neither true nor false';
+  //   } catch (e) {
+  //     print('Error fetching data: $e');
+  //     rethrow; // Rethrow to let the caller handle the error
+  //   }
+  // }
 
   //Fetch Dictionary Words
   // Future<DictionaryDataModel> fetchDictionaryWords() async {

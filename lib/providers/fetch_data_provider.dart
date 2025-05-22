@@ -57,14 +57,14 @@ class FetchDataProvider extends ChangeNotifier {
       if (online) {
         debugPrint('✅ Internet reachable — fetching from API');
         final res = await apiServices.fetchData();
-        final premiumres = await apiServices.fetchPremiumFeatures();
-        if (res.success == true && premiumres.success == true) {
+        // final premiumres = await apiServices.fetchPremiumFeatures();
+        if (res.success == true) {
           categoriesData = res;
-          premiumFeaturesData = premiumres;
+          // premiumFeaturesData = premiumres;
           final jsonStr = CategoriesDataModelToJson(res);
-          final premiumJsonString = premiumDataModelToJson(premiumres);
+          // final premiumJsonString = premiumDataModelToJson(premiumres);
           await prefs.setString('categories_json', jsonStr);
-          await prefs.setString('premium_categories_json', premiumJsonString);
+          // await prefs.setString('premium_categories_json', premiumJsonString);
 
           debugPrint('Fetched and cached categories');
         } else {
@@ -74,12 +74,12 @@ class FetchDataProvider extends ChangeNotifier {
       } else {
         debugPrint('⚠️ No internet — loading from cache');
         await _loadFromCache(prefs);
-        await _loadPremiumCache(prefs);
+        // await _loadPremiumCache(prefs);
       }
     } catch (e) {
       debugPrint('fetchCategories error: $e — loading from cache');
       await _loadFromCache(prefs);
-      await _loadPremiumCache(prefs);
+      // await _loadPremiumCache(prefs);
     } finally {
       isLoading = false;
       notifyListeners();
@@ -98,14 +98,14 @@ class FetchDataProvider extends ChangeNotifier {
   }
   //
 
-  Future<void> _loadPremiumCache(SharedPreferences prefs) async {
-    if (prefs.containsKey('premium_categories_json')) {
-      final jsonStr = prefs.getString('premium_categories_json')!;
-      premiumFeaturesData = premiumDataModelFromJson(jsonStr);
-      debugPrint('Loaded categories from cache');
-    } else {
-      debugPrint('No cached categories found');
-      categoriesData = null;
-    }
-  }
+  //   Future<void> _loadPremiumCache(SharedPreferences prefs) async {
+  //     if (prefs.containsKey('premium_categories_json')) {
+  //       final jsonStr = prefs.getString('premium_categories_json')!;
+  //       premiumFeaturesData = premiumDataModelFromJson(jsonStr);
+  //       debugPrint('Loaded categories from cache');
+  //     } else {
+  //       debugPrint('No cached categories found');
+  //       categoriesData = null;
+  //     }
+  //   }
 }
