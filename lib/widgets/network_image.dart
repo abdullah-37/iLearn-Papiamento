@@ -22,7 +22,9 @@ class CustomNetworkImageWidget extends StatelessWidget {
       height: imageHeight,
       width: imageWidth,
 
-      placeholder: (context, url) => const CircularProgressIndicator(),
+      placeholder:
+          (context, url) =>
+              const CircularProgressIndicator(color: Colors.transparent),
       errorWidget: (context, url, error) => const Icon(Icons.error),
     );
   }

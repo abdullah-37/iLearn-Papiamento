@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ilearn_papiamento/config/config.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:ilearn_papiamento/config/images.dart';
-
-const String removeAdsMonthlyId = 'buy_code_1';
-const String removeAdsYearlyId = 'buy_code_3';
-const String dictionaryMonthlyId = 'buy_code_4';
-const String dictionaryYearlyId = 'buy_code_5';
 
 class Category {
   final String name;
@@ -25,7 +20,6 @@ class PurchaseProvider with ChangeNotifier {
   final InAppPurchase _iap = InAppPurchase.instance;
   List<ProductDetails> _products = [];
   List<PurchaseDetails> _purchases = [];
-  List<Category> _categories = [];
   bool _isRemoveAdsPurchased = false;
 
   PurchaseProvider() {
@@ -40,7 +34,7 @@ class PurchaseProvider with ChangeNotifier {
   Future<void> _initialize() async {
     await loadProducts();
     await restorePurchases();
-    _setupCategories();
+
     checkRemoveAdsPurchased();
     notifyListeners();
   }
@@ -49,8 +43,8 @@ class PurchaseProvider with ChangeNotifier {
   void checkRemoveAdsPurchased() {
     final bool isp = _purchases.any(
       (purchase) =>
-          purchase.productID == removeAdsMonthlyId ||
-          purchase.productID == removeAdsYearlyId &&
+          purchase.productID == AppConfig.monthlyProductId ||
+          purchase.productID == AppConfig.yearlyProductId &&
               purchase.status == PurchaseStatus.purchased,
     );
     if (isp) {
@@ -64,10 +58,8 @@ class PurchaseProvider with ChangeNotifier {
     final bool available = await _iap.isAvailable();
     if (!available) return;
     const Set<String> ids = {
-      removeAdsMonthlyId,
-      removeAdsYearlyId,
-      dictionaryMonthlyId,
-      dictionaryYearlyId,
+      AppConfig.monthlyProductId,
+      AppConfig.yearlyProductId,
     };
     final ProductDetailsResponse response = await _iap.queryProductDetails(ids);
     _products = response.productDetails;
@@ -95,25 +87,24 @@ class PurchaseProvider with ChangeNotifier {
     await _iap.buyNonConsumable(purchaseParam: purchaseParam);
   }
 
-  void _setupCategories() {
-    _categories = [
-      Category(
-        name: 'Remove Ads',
-        grantingProductIds: [removeAdsMonthlyId, removeAdsYearlyId],
-        color: const Color.fromARGB(255, 188, 204, 16),
-        image: AppImages.removeads,
-      ),
-      Category(
-        name: 'Dictionary',
-        grantingProductIds: [dictionaryMonthlyId, dictionaryYearlyId],
-        color: const Color.fromARGB(255, 1, 163, 131),
-        image: AppImages.dictionary,
-      ),
-    ];
-  }
+  // void _setupCategories() {
+  //   _categories = [
+  //     Category(
+  //       name: 'Remove Ads',
+  //       grantingProductIds: [removeAdsMonthlyId, removeAdsYearlyId],
+  //       color: const Color.fromARGB(255, 188, 204, 16),
+  //       image: AppImages.removeads,
+  //     ),
+  //     Category(
+  //       name: 'Dictionary',
+  //       grantingProductIds: [dictionaryMonthlyId, dictionaryYearlyId],
+  //       color: const Color.fromARGB(255, 1, 163, 131),
+  //       image: AppImages.dictionary,
+  //     ),
+  //   ];
+  // }
 
   // Getters
-  List<Category> get categories => _categories;
   List<ProductDetails> get products => _products;
   bool get isRemoveAdsPurchased => _isRemoveAdsPurchased;
 }

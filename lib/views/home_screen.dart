@@ -55,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     var adsProvider = context.watch<AdsProvider>();
+
     var isadsremoved = context.watch<PurchaseProvider>().isRemoveAdsPurchased;
 
     final size = MediaQuery.of(context).size;
@@ -341,10 +342,10 @@ class MainContentWidget extends StatelessWidget {
                 Container(
                   height: 50,
                   color: AppColors.learnTileopenedbg,
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      'Premium Features',
-                      style: TextStyle(fontSize: 20, color: Colors.white),
+                      appLocalizations.unlock_premium_features,
+                      style: const TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ),
                 ),

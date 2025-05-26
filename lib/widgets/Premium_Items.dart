@@ -1,20 +1,32 @@
-// PremiumItems Widget
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
+import 'package:ilearn_papiamento/config/app_colors.dart';
+import 'package:ilearn_papiamento/config/config.dart';
+import 'package:ilearn_papiamento/config/images.dart';
 import 'package:ilearn_papiamento/providers/purchase_provider.dart';
+import 'package:ilearn_papiamento/widgets/monthly_description.dart';
+import 'package:ilearn_papiamento/widgets/yearly_description.dart.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PremiumItems extends StatelessWidget {
   const PremiumItems({super.key});
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocalizations = AppLocalizations.of(context)!;
+
     return Consumer<PurchaseProvider>(
       builder: (context, provider, child) {
-        if (provider.categories.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        bool isPurchased = provider.isPurchased([
+          AppConfig.monthlyProductId,
+          AppConfig.yearlyProductId,
+        ]);
+        // if (provider.categories.isEmpty) {
+        //   return const Center(child: CircularProgressIndicator());
+        // }
+        print(
+          "=========================================================$isPurchased",
+        );
 
         return Padding(
           padding: const EdgeInsets.all(0),
@@ -25,56 +37,66 @@ class PremiumItems extends StatelessWidget {
             childAspectRatio: 1,
             crossAxisSpacing: 13,
             mainAxisSpacing: 13,
-            children:
-                provider.categories.map((category) {
-                  final isPurchased = provider.isPurchased(
-                    category.grantingProductIds,
+            children: [
+              if (!isPurchased)
+                GestureDetector(
+                  onTap: () {
+                    _showPurchaseSheet(
+                      context,
+                      AppConfig.monthlyProductId,
+                      AppConfig.yearlyProductId,
+                      Colors.blue,
+                      provider,
+                    );
+                  },
+                  child: Stack(
+                    fit: StackFit.expand,
+
+                    children: [
+                      PremiumItemWidget(
+                        categoryName: appLocalizations.removeads,
+                        categoryImage: AppImages.removeads,
+                        color: AppColors.removeAdColor,
+                      ),
+                      Container(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        child: const Center(
+                          child: Icon(Icons.lock, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              // Dictionary
+              GestureDetector(
+                onTap: () {
+                  _showPurchaseSheet(
+                    context,
+                    AppConfig.monthlyProductId,
+                    AppConfig.yearlyProductId,
+                    Colors.blue,
+                    provider,
                   );
-                  return GestureDetector(
-                    onTap: () {
-                      if (isPurchased) {
-                        if (category.name == 'Dictionary') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) =>
-                                      const DictionaryPage(color: Colors.blue),
-                            ),
-                          );
-                        }
-                        // For "Remove Ads", no action needed as ads are removed
-                      } else {
-                        _showPurchaseSheet(
-                          context,
-                          category,
-                          category.color,
-                          provider,
-                        );
-                      }
-                    },
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        PremiumItemWidget(category: category),
-                        if (!isPurchased)
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black45.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.lock,
-                                size: 20,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                      ],
+                },
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    PremiumItemWidget(
+                      categoryName: appLocalizations.dictionary,
+                      categoryImage: AppImages.dictionary,
+                      color: AppColors.dictionaryColor,
                     ),
-                  );
-                }).toList(),
+                    if (!isPurchased)
+                      Container(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        child: const Center(
+                          child: Icon(Icons.lock, color: Colors.white),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -83,26 +105,11 @@ class PremiumItems extends StatelessWidget {
 
   void _showPurchaseSheet(
     BuildContext context,
-    Category category,
+    String monthlyId,
+    String yearlyId,
     Color color,
     PurchaseProvider provider,
   ) {
-    String monthlyId;
-    String yearlyId;
-    String title;
-
-    if (category.name == 'Remove Ads') {
-      monthlyId = removeAdsMonthlyId;
-      yearlyId = removeAdsYearlyId;
-      title = 'Remove Ads';
-    } else if (category.name == 'Dictionary') {
-      monthlyId = dictionaryMonthlyId;
-      yearlyId = dictionaryYearlyId;
-      title = 'Unlock Dictionary';
-    } else {
-      return; // Unknown category
-    }
-
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -114,7 +121,7 @@ class PremiumItems extends StatelessWidget {
             provider: provider,
             monthlyProductId: monthlyId,
             yearlyProductId: yearlyId,
-            title: title,
+            // title: 'Unlock Premium Features',
             color: color,
           ),
     );
@@ -125,7 +132,7 @@ class SubscriptionOptions extends StatefulWidget {
   final PurchaseProvider provider;
   final String monthlyProductId;
   final String yearlyProductId;
-  final String title;
+  // final String title;
   final Color color;
 
   const SubscriptionOptions({
@@ -133,7 +140,7 @@ class SubscriptionOptions extends StatefulWidget {
     required this.provider,
     required this.monthlyProductId,
     required this.yearlyProductId,
-    required this.title,
+    // required this.title,
     required this.color,
   });
 
@@ -146,6 +153,8 @@ class _SubscriptionOptionsState extends State<SubscriptionOptions> {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocalizations = AppLocalizations.of(context)!;
+
     final monthlyProduct = widget.provider.products.firstWhere(
       (p) => p.id == widget.monthlyProductId,
       orElse: () => throw Exception('Monthly product not found'),
@@ -157,66 +166,74 @@ class _SubscriptionOptionsState extends State<SubscriptionOptions> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            widget.title,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: () => setState(() => isMonthly = true),
-                child: PriceDetailContainer(
-                  per: "month",
-                  type: "MONTHLY",
-                  price: monthlyProduct.price,
-                  isSelected: isMonthly,
-                  color: widget.color,
-                ),
-              ),
-              const SizedBox(width: 20),
-              GestureDetector(
-                onTap: () => setState(() => isMonthly = false),
-                child: PriceDetailContainer(
-                  type: "YEARLY",
-                  per: "year",
-                  price: yearlyProduct.price,
-                  isSelected: !isMonthly,
-                  color: widget.color,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 40),
-          GestureDetector(
-            onTap: () {
-              final selectedProduct =
-                  isMonthly ? monthlyProduct : yearlyProduct;
-              widget.provider.buyProduct(selectedProduct);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: widget.color,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              child: const Center(
-                child: Text(
-                  'Continue',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              appLocalizations.unlock_premium_features,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () => setState(() => isMonthly = true),
+                  child: PriceDetailContainer(
+                    per: "",
+                    type: appLocalizations.monthly,
+                    price: monthlyProduct.price,
+                    isSelected: isMonthly,
+                    color: widget.color,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () => setState(() => isMonthly = false),
+                  child: PriceDetailContainer(
+                    type: appLocalizations.yearly,
+                    per: "",
+                    price: yearlyProduct.price,
+                    isSelected: !isMonthly,
+                    color: widget.color,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            if (!isMonthly) const YearlyPremiumDescription(),
+            if (isMonthly) const MonthlyPremiumDescription(),
+
+            const SizedBox(height: 10),
+
+            GestureDetector(
+              onTap: () {
+                final selectedProduct =
+                    isMonthly ? monthlyProduct : yearlyProduct;
+                widget.provider.buyProduct(selectedProduct);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: widget.color,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                child: Center(
+                  child: Text(
+                    appLocalizations.continuee,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -260,17 +277,15 @@ class PriceDetailContainer extends StatelessWidget {
         ],
       ),
       child: Column(
-        spacing: 10,
+        spacing: 20,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: Text(
-              type,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-              ),
+          Text(
+            type,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.black,
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
             ),
           ),
           FittedBox(
@@ -284,16 +299,16 @@ class PriceDetailContainer extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            child: Text(
-              'per $per',
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          // Expanded(
+          //   child: Text(
+          //     'per $per',
+          //     style: TextStyle(
+          //       color: isSelected ? Colors.white : Colors.black,
+          //       fontSize: 16,
+          //       fontWeight: FontWeight.bold,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -318,27 +333,34 @@ class DictionaryPage extends StatelessWidget {
 
 // Placeholder HomeGridWidget
 class PremiumItemWidget extends StatelessWidget {
-  final Category category;
+  final Color color;
+  final String categoryName;
+  final String categoryImage;
 
-  const PremiumItemWidget({super.key, required this.category});
+  const PremiumItemWidget({
+    super.key,
+    required this.color,
+    required this.categoryName,
+    required this.categoryImage,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: category.color,
+        color: color,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(flex: 2, child: Image.asset(category.image)),
+          Expanded(flex: 2, child: Image.asset(categoryImage)),
           const SizedBox(height: 8),
           FittedBox(
             child: Text(
               // 'sdsds sdsd d',
-              category.name,
+              categoryName,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 // fontFamily: AppConfig.avenir,

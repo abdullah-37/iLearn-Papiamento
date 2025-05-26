@@ -19,7 +19,17 @@
   "settings":"configuración",
   "get_ad_free_experience_for": "Obtén una experiencia sin anuncios por",
   "buy_for": "Comprar por",
-  "papiamento": "Papiamento"
+  "papiamento": "Papiamento",
+  "unlock_premium_features":"Desbloquear funciones premium",
+  "dictionary":"Diccionario",
+  "monthly":"Mensual",
+  "yearly":"Anual",
+  "continuee":"Continuar",
+  "description1m":"Sin anuncios – Disfruta de Learn Papiamento sin anuncios durante 30 días",
+  "description1y":"Sin anuncios – Disfruta de Learn Papiamento sin anuncios durante 12 meses",
+  "description2":"Accede a nuestro diccionario de papiamento que contiene más de 3000 palabras (sin audio por ahora, se implementará en futuras versiones)",
+  "description3":"Durante la suscripción, todas las funciones premium futuras serán accesibles automáticamente.",
+  "description4":"Mejor experiencia en la app sin interrupciones"
 
 
 
