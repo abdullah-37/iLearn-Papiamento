@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/config/config.dart';
 import 'package:ilearn_papiamento/config/images.dart';
+import 'package:ilearn_papiamento/l10n/app_localizations.dart';
 import 'package:ilearn_papiamento/providers/purchase_provider.dart';
 import 'package:ilearn_papiamento/widgets/monthly_description.dart';
 import 'package:ilearn_papiamento/widgets/yearly_description.dart.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:collection/collection.dart';
 
 class PremiumItems extends StatelessWidget {
   const PremiumItems({super.key});
@@ -132,7 +134,6 @@ class SubscriptionOptions extends StatefulWidget {
   final PurchaseProvider provider;
   final String monthlyProductId;
   final String yearlyProductId;
-  // final String title;
   final Color color;
 
   const SubscriptionOptions({
@@ -140,7 +141,6 @@ class SubscriptionOptions extends StatefulWidget {
     required this.provider,
     required this.monthlyProductId,
     required this.yearlyProductId,
-    // required this.title,
     required this.color,
   });
 
@@ -149,90 +149,134 @@ class SubscriptionOptions extends StatefulWidget {
 }
 
 class _SubscriptionOptionsState extends State<SubscriptionOptions> {
-  bool isMonthly = true;
+  bool isMonthly = true; // Used only when both options are available
 
   @override
   Widget build(BuildContext context) {
     AppLocalizations appLocalizations = AppLocalizations.of(context)!;
 
-    final monthlyProduct = widget.provider.products.firstWhere(
+    // Safely find products using firstWhereOrNull
+    final monthlyProduct = widget.provider.products.firstWhereOrNull(
       (p) => p.id == widget.monthlyProductId,
-      orElse: () => throw Exception('Monthly product not found'),
     );
-    final yearlyProduct = widget.provider.products.firstWhere(
+    final yearlyProduct = widget.provider.products.firstWhereOrNull(
       (p) => p.id == widget.yearlyProductId,
-      orElse: () => throw Exception('Yearly product not found'),
     );
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              appLocalizations.unlock_premium_features,
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+    // Check availability
+    bool isMonthlyAvailable = monthlyProduct != null;
+    bool isYearlyAvailable = yearlyProduct != null;
+    bool bothAvailable = isMonthlyAvailable && isYearlyAvailable;
+
+    // Determine the selected product
+    ProductDetails? selectedProduct;
+    if (bothAvailable) {
+      selectedProduct = isMonthly ? monthlyProduct : yearlyProduct;
+    } else if (isMonthlyAvailable) {
+      selectedProduct = monthlyProduct;
+    } else if (isYearlyAvailable) {
+      selectedProduct = yearlyProduct;
+    }
+
+    // Build the list of available options
+    List<Widget> options = [];
+    if (isMonthlyAvailable) {
+      Widget monthlyOption = PriceDetailContainer(
+        per: "",
+        type: appLocalizations.monthly,
+        price: monthlyProduct.price,
+        isSelected: bothAvailable ? isMonthly : true,
+        color: widget.color,
+      );
+      options.add(
+        bothAvailable
+            ? GestureDetector(
+              onTap: () => setState(() => isMonthly = true),
+              child: monthlyOption,
+            )
+            : monthlyOption,
+      );
+    }
+    if (isYearlyAvailable) {
+      Widget yearlyOption = PriceDetailContainer(
+        per: "",
+        type: appLocalizations.yearly,
+        price: yearlyProduct.price,
+        isSelected: bothAvailable ? !isMonthly : true,
+        color: widget.color,
+      );
+      options.add(
+        bothAvailable
+            ? GestureDetector(
+              onTap: () => setState(() => isMonthly = false),
+              child: yearlyOption,
+            )
+            : yearlyOption,
+      );
+    }
+
+    return SingleChildScrollView(
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Text(
+                appLocalizations.unlock_premium_features,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              const SizedBox(height: 20),
+              if (options.isNotEmpty) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:
+                      options.length == 2
+                          ? [options[0], const SizedBox(width: 10), options[1]]
+                          : options,
+                ),
+                const SizedBox(height: 20),
+                if (selectedProduct == monthlyProduct)
+                  const MonthlyPremiumDescription()
+                else if (selectedProduct == yearlyProduct)
+                  const YearlyPremiumDescription(),
+                const SizedBox(height: 10),
                 GestureDetector(
-                  onTap: () => setState(() => isMonthly = true),
-                  child: PriceDetailContainer(
-                    per: "",
-                    type: appLocalizations.monthly,
-                    price: monthlyProduct.price,
-                    isSelected: isMonthly,
-                    color: widget.color,
+                  onTap: () {
+                    if (selectedProduct != null) {
+                      widget.provider.buyProduct(selectedProduct);
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: widget.color,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    child: Center(
+                      child: Text(
+                        appLocalizations.continuee,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () => setState(() => isMonthly = false),
-                  child: PriceDetailContainer(
-                    type: appLocalizations.yearly,
-                    per: "",
-                    price: yearlyProduct.price,
-                    isSelected: !isMonthly,
-                    color: widget.color,
-                  ),
+              ] else ...[
+                Text(
+                  appLocalizations.products_not_found,
+                  style: const TextStyle(color: Colors.red, fontSize: 16),
                 ),
               ],
-            ),
-            const SizedBox(height: 20),
-
-            if (!isMonthly) const YearlyPremiumDescription(),
-            if (isMonthly) const MonthlyPremiumDescription(),
-
-            const SizedBox(height: 10),
-
-            GestureDetector(
-              onTap: () {
-                final selectedProduct =
-                    isMonthly ? monthlyProduct : yearlyProduct;
-                widget.provider.buyProduct(selectedProduct);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: widget.color,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                child: Center(
-                  child: Text(
-                    appLocalizations.continuee,
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

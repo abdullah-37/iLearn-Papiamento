@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ilearn_papiamento/Services/audio_service.dart';
@@ -8,6 +7,7 @@ import 'package:ilearn_papiamento/Services/shared_prefrence.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/config/config.dart';
+import 'package:ilearn_papiamento/l10n/app_localizations.dart';
 import 'package:ilearn_papiamento/providers/ads_provider.dart';
 import 'package:ilearn_papiamento/providers/app_settings_provider.dart';
 import 'package:ilearn_papiamento/providers/audio_provider.dart';

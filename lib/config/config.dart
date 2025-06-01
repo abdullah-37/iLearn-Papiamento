@@ -18,8 +18,8 @@ class AppConfig {
       "https://www.learnpapiamento.com/backend/api/words.php";
 
   static const String adminUserName = 'ilearn';
-  static const String monthlyProductId = 'buy_code_1';
-  static const String yearlyProductId = 'buy_code_3';
+  static const String monthlyProductId = 'learnpapiamento.subscription.month';
+  static const String yearlyProductId = 'learnpapiamento.subscription.yearly';
   static const String adminPassword = 'shdd211as';
   static const String language = 'selected_language';
   static const String voiceSpeed = 'voice_speed';

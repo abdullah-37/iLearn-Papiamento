@@ -25,7 +25,7 @@
   "@visitourpage": {},
   "facebooksupport":"Facebook/Support",
   "@facebooksupport": {},
-  "likeusonfacebook":"Like us on Facebok",
+  "likeusonfacebook":"Like us on Facebook",
   "@likeusonfacebook": {},
   "followontwitter": "Follow on Twitter",
   "@followontwitter": {},
@@ -45,6 +45,7 @@
   "description1y":"Go Add-Free – Enjoy Learn Papiamento without Ads for 12 Months",
   "description2":"Access to our Papiamento Dictionary which contains over 3000 words (No Audio yet, Audio will be implemented in future versions)",
   "description3":"During the subscription, all upcoming premium features are automatically accessible.",
-  "description4":"Better app experience without interruptions"
+  "description4":"Better app experience without interruptions",
+  "products_not_found":"Products not found."
 
 }

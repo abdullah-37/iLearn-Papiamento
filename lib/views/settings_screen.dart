@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:ilearn_papiamento/config/app_colors.dart';
 import 'package:ilearn_papiamento/config/app_strings.dart';
 import 'package:ilearn_papiamento/config/images.dart';
@@ -8,6 +7,8 @@ import 'package:ilearn_papiamento/providers/purchase_provider.dart';
 import 'package:ilearn_papiamento/views/language_selection_screen.dart';
 import 'package:ilearn_papiamento/widgets/slider.dart';
 import 'package:provider/provider.dart';
+import 'package:widget_to_marker/widget_to_marker.dart';
+import 'package:ilearn_papiamento/l10n/app_localizations.dart';
 
 // import 'package:in_app_purchase/in_app_purchase.dart';
 
@@ -243,7 +244,7 @@ class SettingsPanelWidget extends StatelessWidget {
             ),
             SettingTile(
               image: AppImages.twitter,
-              title: appLocalizations.likeusonfacebook,
+              title: appLocalizations.followontwitter,
             ),
           ],
         ),
