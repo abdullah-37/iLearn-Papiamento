@@ -98,16 +98,16 @@ class _DictionaryPageState extends State<DictionaryPage> {
                             () => _expandedIndex = isExpanded ? null : idx,
                           );
                           if (autoPlay && !isExpanded) {
-                            try {
-                              await context.read<AudioProvider>().play(
-                                words.audioFile!,
-                                speed,
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(e.toString())),
-                              );
-                            }
+                            // try {
+                            //   // await context.read<AudioProvider>().play(
+                            //   //   words.audioFile!,
+                            //   //   speed,
+                            //   // );
+                            // } catch (e) {
+                            //   ScaffoldMessenger.of(context).showSnackBar(
+                            //     SnackBar(content: Text(e.toString())),
+                            //   );
+                            // }
                           }
                         },
                       );

@@ -49,7 +49,7 @@ class DictionaryProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      print('-----------------------------------$_pageIndex');
+      // print('-----------------------------------$_pageIndex');
       final resp = await _dio.get(
         AppConfig.dictioanyWordsUrl,
         // queryParameters: {'paginate': _paginateCount, 'page': _pageIndex},

@@ -75,6 +75,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unlock_premium_features => '解锁高级功能';
 
   @override
+  String get premium_features => '高级功能';
+
+  @override
   String get dictionary => '字典';
 
   @override

@@ -75,6 +75,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unlock_premium_features => 'Unlock Premium Features';
 
   @override
+  String get premium_features => 'Premium Features';
+
+  @override
   String get dictionary => 'Dictionary';
 
   @override

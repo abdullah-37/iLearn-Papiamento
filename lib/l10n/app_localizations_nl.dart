@@ -76,6 +76,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get unlock_premium_features => 'Premiumfuncties ontgrendelen';
 
   @override
+  String get premium_features => 'Premiumfuncties';
+
+  @override
   String get dictionary => 'Woordenboek';
 
   @override

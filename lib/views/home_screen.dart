@@ -12,7 +12,7 @@ import 'package:ilearn_papiamento/providers/purchase_provider.dart';
 import 'package:ilearn_papiamento/views/favourite_screen.dart';
 import 'package:ilearn_papiamento/views/learn_screen.dart';
 import 'package:ilearn_papiamento/views/settings_screen.dart';
-import 'package:ilearn_papiamento/widgets/Premium_Items.dart';
+import 'package:ilearn_papiamento/widgets/premium_Items.dart';
 import 'package:ilearn_papiamento/widgets/home_grid_widget.dart' as homegrid;
 import 'package:ilearn_papiamento/widgets/line_below_appbar.dart';
 import 'package:provider/provider.dart';
@@ -339,18 +339,17 @@ class MainContentWidget extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Premium Features
-                Container(
-                  height: 50,
-                  color: AppColors.learnTileopenedbg,
-                  child: Center(
-                    child: Text(
-                      appLocalizations.unlock_premium_features,
-                      style: const TextStyle(fontSize: 20, color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
+                // Container(
+                //   height: 50,
+                //   color: AppColors.learnTileopenedbg,
+                //   child: Center(
+                //     child: Text(
+                //       appLocalizations.unlock_premium_features,
+                //       style: const TextStyle(fontSize: 20, color: Colors.white),
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(height: 20),
                 const PremiumItems(),
 
                 // //remove adds

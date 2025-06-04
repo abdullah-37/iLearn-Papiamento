@@ -4,6 +4,7 @@ import 'package:ilearn_papiamento/config/config.dart';
 import 'package:ilearn_papiamento/config/images.dart';
 import 'package:ilearn_papiamento/l10n/app_localizations.dart';
 import 'package:ilearn_papiamento/providers/purchase_provider.dart';
+import 'package:ilearn_papiamento/views/dictionary_view.dart';
 import 'package:ilearn_papiamento/widgets/monthly_description.dart';
 import 'package:ilearn_papiamento/widgets/yearly_description.dart.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -26,77 +27,105 @@ class PremiumItems extends StatelessWidget {
         // if (provider.categories.isEmpty) {
         //   return const Center(child: CircularProgressIndicator());
         // }
-        print(
-          "=========================================================$isPurchased",
-        );
+        // print(
+        //   "=========================================================$isPurchased",
+        // );
 
         return Padding(
           padding: const EdgeInsets.all(0),
-          child: GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 3,
-            childAspectRatio: 1,
-            crossAxisSpacing: 13,
-            mainAxisSpacing: 13,
+          child: Column(
             children: [
-              if (!isPurchased)
-                GestureDetector(
-                  onTap: () {
-                    _showPurchaseSheet(
-                      context,
-                      AppConfig.monthlyProductId,
-                      AppConfig.yearlyProductId,
-                      Colors.blue,
-                      provider,
-                    );
-                  },
-                  child: Stack(
-                    fit: StackFit.expand,
-
-                    children: [
-                      PremiumItemWidget(
-                        categoryName: appLocalizations.removeads,
-                        categoryImage: AppImages.removeads,
-                        color: AppColors.removeAdColor,
-                      ),
-                      Container(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        child: const Center(
-                          child: Icon(Icons.lock, color: Colors.white),
-                        ),
-                      ),
-                    ],
+              Container(
+                height: 50,
+                color: AppColors.learnTileopenedbg,
+                child: Center(
+                  child: Text(
+                    isPurchased
+                        ? appLocalizations.premium_features
+                        : appLocalizations.unlock_premium_features,
+                    style: const TextStyle(fontSize: 20, color: Colors.white),
                   ),
                 ),
-              // Dictionary
-              GestureDetector(
-                onTap: () {
-                  _showPurchaseSheet(
-                    context,
-                    AppConfig.monthlyProductId,
-                    AppConfig.yearlyProductId,
-                    Colors.blue,
-                    provider,
-                  );
-                },
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    PremiumItemWidget(
-                      categoryName: appLocalizations.dictionary,
-                      categoryImage: AppImages.dictionary,
-                      color: AppColors.dictionaryColor,
-                    ),
-                    if (!isPurchased)
-                      Container(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        child: const Center(
-                          child: Icon(Icons.lock, color: Colors.white),
-                        ),
+              ),
+              const SizedBox(height: 20),
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 3,
+                childAspectRatio: 1,
+                crossAxisSpacing: 13,
+                mainAxisSpacing: 13,
+                children: [
+                  if (!isPurchased)
+                    GestureDetector(
+                      onTap: () {
+                        _showPurchaseSheet(
+                          context,
+                          AppConfig.monthlyProductId,
+                          AppConfig.yearlyProductId,
+                          Colors.blue,
+                          provider,
+                        );
+                      },
+                      child: Stack(
+                        fit: StackFit.expand,
+
+                        children: [
+                          PremiumItemWidget(
+                            categoryName: appLocalizations.removeads,
+                            categoryImage: AppImages.removeads,
+                            color: AppColors.removeAdColor,
+                          ),
+                          Container(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            child: const Center(
+                              child: Icon(Icons.lock, color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
-                  ],
-                ),
+                    ),
+                  // Dictionary
+                  GestureDetector(
+                    onTap: () {
+                      if (isPurchased) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    const DictionaryPage(color: Colors.blue),
+                          ),
+                        );
+                      } else {
+                        _showPurchaseSheet(
+                          context,
+                          AppConfig.monthlyProductId,
+                          AppConfig.yearlyProductId,
+                          Colors.blue,
+                          provider,
+                        );
+                      }
+                    },
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        PremiumItemWidget(
+                          categoryName: appLocalizations.dictionary,
+                          categoryImage: AppImages.dictionary,
+                          color: AppColors.dictionaryColor,
+                        ),
+                        if (!isPurchased)
+                          Container(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            child: const Center(
+                              child: Icon(Icons.lock, color: Colors.white),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -359,21 +388,21 @@ class PriceDetailContainer extends StatelessWidget {
   }
 }
 
-// Placeholder DictionaryPage
-class DictionaryPage extends StatelessWidget {
-  final Color color;
-  const DictionaryPage({super.key, required this.color});
+// // Placeholder DictionaryPage
+// class DictionaryPage extends StatelessWidget {
+//   final Color color;
+//   const DictionaryPage({super.key, required this.color});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Dictionary')),
-      body: Center(
-        child: Text('Dictionary Page', style: TextStyle(color: color)),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Dictionary')),
+//       body: Center(
+//         child: Text('Dictionary Page', style: TextStyle(color: color)),
+//       ),
+//     );
+//   }
+// }
 
 // Placeholder HomeGridWidget
 class PremiumItemWidget extends StatelessWidget {

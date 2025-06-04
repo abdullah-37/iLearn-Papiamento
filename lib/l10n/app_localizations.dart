@@ -234,6 +234,12 @@ abstract class AppLocalizations {
   /// **'Unlock Premium Features'**
   String get unlock_premium_features;
 
+  /// No description provided for @premium_features.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Features'**
+  String get premium_features;
+
   /// No description provided for @dictionary.
   ///
   /// In en, this message translates to:
